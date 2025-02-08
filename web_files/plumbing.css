@@ -1,0 +1,355 @@
+/*!
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ */
+/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+
+*{
+	font: 400 "Roboto", Helvetica, Arial, sans-serif;
+}
+
+.navbar {
+    position: relative;
+    min-height: 120px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(0, 0, 0, 0);
+} 
+.navbar-brand {
+    float: left;
+    height: 120px;
+    padding: 0px 15px;
+
+}
+.navbar-default {
+    background-color: #fff;
+    border:none;
+}
+
+
+
+/* @media (max-width: 767px){ */
+/* 	.logo{ */
+/* 		width:300px; */
+/* 	} */
+/* 	.color { */
+/*     height: 50px; */
+/*     background-color: #01323b; */
+/* } */
+/* } */
+
+/* @media (min-width: 768px){ */
+/* .navbar-nav>li>a { */
+/*     padding-top: 85px; */
+/*     padding-bottom: 15px; */
+/*         font-size: 20px; */
+/* }} */
+
+/* @media screen and (min-width: 320px){ */
+/* h2.left{ */
+/* 	    float: left; */
+/*     font-size: 18px; */
+/*     font-weight: 400; */
+/*         width: 90%; */
+/*         padding-right: 0px; */
+/* }} */
+
+
+h2.left{
+	    float: left;
+    font-size: 18px;
+    font-weight: 400;
+        width: 90%;
+        padding-right: 80px;
+}
+.navbar-right {
+    float: right!important;
+    margin-right: -15px;
+}
+
+.navbar-nav>li>a {
+    padding-top: 85px;
+    padding-bottom: 15px;
+    font-size: 16px;
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: #01323b;
+}
+
+.intro-message > h3 {
+    text-shadow:none;
+    color: #01323b;
+}
+
+
+.topnumber{
+	background-color:#01323b;
+	color:#fff;
+	margin: 0px;
+    text-align: center;
+    padding:5px 0px 5px 0px;
+}
+
+
+
+
+.intro-header {
+    padding-top: 0px;
+    text-align: left;
+    color: #f8f8f8;
+    background: #41b7ea;
+    background-size: cover;
+}
+
+.img-responsive{
+	background-blend-mode: multyply;
+}
+
+h2{
+	    line-height: 1.5em;
+    letter-spacing: 1px;
+}
+.intro-message {
+    position: relative;
+    padding-top: 10%;
+    padding-bottom: 10%;
+}
+
+
+.list-inline {
+    padding-left: 0;
+    /* margin-left: -5px; */
+    float: left;
+}
+
+a {
+    color: #41b7ea;
+    text-decoration: none;
+}
+a:hover {
+    color: #70c3ed !important;
+}
+/* .hr2{ */
+/* 	    display: block; */
+/* } */
+
+
+.intro-divider {
+    width: 400px;
+    border-top: 0px;
+    border-bottom: 0px;
+}
+
+.lead {
+    font-size: 18px;
+    color: #01323b;
+    font-weight: 400;
+}
+
+.fff{
+	color:#fff;
+}
+
+.network-name {
+    text-transform: inherit;
+}
+
+.banner {
+    padding: 100px 0;
+    color: #f8f8f8;
+    background: url(/web/20220927014741im_/http://www.ga5starplumbing.com/img/pipe.jpg) no-repeat center center;
+    background-size: cover;
+}
+
+a.estimate{
+	       font-size: 60px;
+    font-weight: 900;
+    color: #fff;
+        text-shadow: 4px 4px 6px rgba(0,0,0,1);
+}
+.content-section-b {
+    padding: 50px 0;
+    border-top: 1px solid #e7e7e7;
+    border-bottom: 1px solid #e7e7e7;
+    background-color:#41b7ea;
+}
+
+.content-section-c {
+    padding: 50px 0;
+    border-top: 1px solid #e7e7e7;
+    border-bottom: 1px solid #e7e7e7;
+    background-color:#dadada;
+}
+
+.btn-default:hover {
+    color: #333;
+    background-color: #fff;
+    border-color: #adadad;
+}
+
+img.bw{
+	filter: grayscale(100%);
+	    border: 3px solid #fff;
+}
+img.bw:hover{
+	filter: grayscale(0%)
+}
+
+footer{
+	background-color:#01323b;
+}
+
+.content-section-a {
+	  padding:40px 0px 80px 0px;
+    background-color: #fff;
+}
+ul.bottom{
+	    margin: 0px;
+    padding: 0px 0px 0px 15px;
+    text-decoration: none;
+    list-style-type: none;
+}
+/* .intro-header{ */
+/*   position: relative; */
+/*   height: 500px; */
+/*   background-image:#41b7ea; */
+/*   border-bottom-left-radius: 20% 20%; */
+/*   border-bottom-right-radius: 20% 20%; */
+/*   border-top-left-radius: 20% 20%; */
+/*   border-top-right-radius: 20% 20%; */
+/* } */
+
+/* gallery */
+.hide-bullets {
+    list-style:none;
+    margin-left: -40px;
+    margin-top:20px;
+}
+
+.thumbnail {
+    padding: 0;
+}
+
+.carousel-inner>.item>img, .carousel-inner>.item>a>img {
+    width: 100%;
+}
+
+
+.carousel-inner {
+    border: 10px solid #fff;
+}
+/*reviews  */
+#carousel-testimonials .carousel-indicators {
+    bottom: inherit;
+        top: 16rem;
+}
+#carousel-testimonials .carousel-indicators li{ 
+    border :2px solid #7c8a8d; 
+    width:16px; 
+    height:16px;
+    margin:0px;
+    } 
+#carousel-testimonials .carousel-indicators .active {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    background-color: #ac1c20;
+    border :2px solid #ac1c20;
+}
+#carousel-testimonials .caption blockquote{
+    font-size:36px;
+    color:#282828;
+    
+}
+#carousel-testimonials .caption small cite{
+    color:#4a4f55;
+    font-size:20px;
+}
+#carousel-testimonials .caption .stars-existing{
+    display:inline-block;
+    font-size:28px;
+}
+#carousel-testimonials .caption .stars-existing .glyphicon-star-empty{
+    color:#ac1c20;
+}
+
+#carousel-testimonials .caption .stars-existing .glyphicon-star{
+    color:#ac1c20;
+}
+.caption{
+	padding: 30px 80px 30px 100px;
+
+}
+.carousel-control2.left {
+        background-image: none;
+}
+.carousel-control2.right {
+        background-image: none;
+}
+.thumbnail {
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+}
+
+.carousel-control2.left {
+   background-color: #41b7ea;
+}
+
+.carousel-control2.right {
+    right: 0;
+    left: auto;
+   background-color: #41b7ea;
+}
+
+
+.carousel-control2 {
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 5%;
+    font-size: 80px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0,0,0,.6);
+    background-color: #41b7ea;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+/*
+     FILE ARCHIVED ON 01:47:41 Sep 27, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 12:37:34 Feb 08, 2025.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 0.729
+  exclusion.robots: 0.029
+  exclusion.robots.policy: 0.012
+  esindex: 0.014
+  cdx.remote: 30.881
+  LoadShardBlock: 1131.24 (3)
+  PetaboxLoader3.datanode: 118.063 (5)
+  PetaboxLoader3.resolve: 1095.989 (2)
+  load_resource: 118.261
+  loaddict: 47.29
+*/

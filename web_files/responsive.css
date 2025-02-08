@@ -1,0 +1,126 @@
+
+
+/*  */
+@media (min-width: 1170px) and (max-width: 1365px){
+
+}
+
+
+
+/* Normal desktop :992px. */
+@media (min-width: 992px) and (max-width: 1169px) {
+
+}
+
+ 
+/* Tablet desktop :767px. */
+@media (min-width: 800px) and (max-width: 991px) {
+	.logo{
+		width:300px;
+			}
+.navbar-nav>li>a {
+    padding-top: 20px;
+}
+/* 	.navbar-nav>li>a { */
+/*     padding-top: 85px; */
+/*     padding-bottom: 15px; */
+/*         font-size: 20px; */
+/* 			} */
+/* 	.navbar-nav>li>a { */
+/*     padding-top: 5px; */
+/*     padding-bottom: 5px; */
+/*     font-size: 20px; */
+/*     background: #41b7ea; */
+/*     border: 1px solid #fff; */
+/* } */
+
+/* .list-inline>li { */
+
+/*     padding-top: 20px; */
+/* } */
+	h2.left{
+        padding-right: 0px;
+}
+}
+
+
+/* Large Mobile :480px. */
+@media only screen and (min-width: 480px) and (max-width: 800px) {
+		.logo{
+		width:300px;
+			}
+	.color {
+    height: 50px;
+    background-color: #01323b;
+			}
+.navbar-nav>li>a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 20px;
+    background: #41b7ea;
+    border: 1px solid #fff;
+}
+	h2.left{
+        padding-right: 0px;
+}
+.hideinmobile{
+		display:none;
+	}
+}
+
+ 
+/* small mobile :320px. */
+@media (max-width: 320px) {
+		.logo{
+		width:300px;
+			}
+	.color {
+    height: 50px;
+    background-color: #01323b;
+			}
+	.navbar-nav>li>a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 20px;
+    background: #41b7ea;
+    border: 1px solid #fff;
+}
+
+.navbar-nav>li>a:first-child { border-top: none; 
+} 
+	.hideinmobile{
+		display:none;
+	}
+
+	h2.left{
+        padding-right: 0px;
+}
+
+}
+ 
+
+ 
+
+
+
+/*
+     FILE ARCHIVED ON 01:47:39 Sep 27, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 12:37:33 Feb 08, 2025.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 0.828
+  exclusion.robots: 0.023
+  exclusion.robots.policy: 0.011
+  esindex: 0.029
+  cdx.remote: 18.42
+  LoadShardBlock: 159.423 (3)
+  PetaboxLoader3.datanode: 180.836 (5)
+  PetaboxLoader3.resolve: 240.305 (2)
+  load_resource: 354.595
+  loaddict: 96.787
+*/
