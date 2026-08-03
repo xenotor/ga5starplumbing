@@ -33,10 +33,14 @@
     // reaches our code. The negative rules keep that cost off static files:
     // hashed bundles and images are served by the asset worker for free, so a
     // page view costs one invocation rather than one per subresource.
+    // booking-embed.* is excluded for the same reason and because other sites
+    // hotlink it by exact name — it must never cost an invocation per view.
     "run_worker_first": [
       "/*",
       "!/assets/*",
       "!/images/*",
+      "!/booking-embed.js",
+      "!/booking-embed.css",
       "!/favicon.ico",
       "!/robots.txt"
     ]

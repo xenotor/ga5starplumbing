@@ -38,6 +38,16 @@ docs/       one topic per file, see docs/README.md
   stay — wrangler syncs triggers each deploy, so dropping it detaches the domain.
 - **The zone carries the shop's Mailgun MX/SPF/DKIM records.** Never delete DNS
   records without checking type; removing those breaks their email.
+- **Booking UI lives only in `frontend/src/booking/`.** Landing pages reference
+  it — barrel import, the `/book` page, or the standalone embed — and never copy
+  it; a fork drifts from the slot rules and loses ad attribution. The built
+  `booking-embed.js` / `booking-embed.css` filenames are a public contract:
+  other sites hotlink them, so they must stay unhashed. See
+  `docs/booking-module.md`.
+- **The Turnstile check is verified in `POST /api/appointments`**, never in
+  front of the page and never from the browser. The bot worth stopping posts
+  straight at the API. `TURNSTILE_SECRET_KEY` unset disables the check (that is
+  how local dev runs); a *present* secret must never be bypassable.
 - **Scheduling rules live in one file**, `workers/src/lib/schedule.ts`. Both the
   availability read and the booking write derive from it — do not reimplement
   slot logic in a route handler.

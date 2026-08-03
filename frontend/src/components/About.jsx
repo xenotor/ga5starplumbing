@@ -5,8 +5,8 @@ import { CheckIcon } from './Icons'
 export default function About() {
   return (
     <>
-      <section id="about" className="bg-brand-900 py-20 text-white">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
+      <section id="about" className="bg-brand-900 py-14 text-white sm:py-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
           <div>
             <SectionHeading eyebrow="Family owned" title="About" invert />
             {ABOUT.map((paragraph) => (
@@ -24,8 +24,8 @@ export default function About() {
         </div>
       </section>
 
-      <section className="bg-white py-20">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
+      <section className="bg-white py-14 sm:py-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
           <div>
             <SectionHeading eyebrow="The difference" title="Why us?" />
             <ul className="mt-8 space-y-3">

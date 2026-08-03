@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 
 import { adminRoutes } from "./api/admin";
 import { appointmentRoutes } from "./api/appointments";
@@ -20,6 +21,13 @@ app.use("*", async (c, next) => {
   }
   await next();
 });
+
+// The booking embed (frontend/src/booking/embed.jsx) runs on other landing
+// pages, so these two endpoints answer cross-origin. Scoped deliberately: the
+// admin routes stay same-origin, and neither of these reads a cookie, so an
+// open origin grants a browser nothing it could not do with a plain fetch.
+app.use("/api/availability", cors({ origin: "*", allowMethods: ["GET", "OPTIONS"] }));
+app.use("/api/appointments", cors({ origin: "*", allowMethods: ["POST", "OPTIONS"] }));
 
 // Liveness / readiness (D1 ping).
 app.get("/api/health", (c) => c.json({ status: "ok" }));

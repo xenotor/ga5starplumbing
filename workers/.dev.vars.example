@@ -19,3 +19,10 @@ ADMIN_TOKEN="local-dev-token"
 # Unset disables notification entirely; leave these as-is for local work.
 NOTIFY_EMAIL_TO="dev@example.com"
 NOTIFY_EMAIL_FROM="bookings@example.com"
+
+# Turnstile secret for the booking form's bot check. Unset (the default here)
+# skips verification so you can book locally without the real secret; the
+# widget still renders, since localhost is a registered domain on it.
+# To exercise the check, use Cloudflare's always-passes / always-fails test
+# secrets: 1x0000000000000000000000000000000AA / 2x0000000000000000000000000000000AA
+# TURNSTILE_SECRET_KEY=""

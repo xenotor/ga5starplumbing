@@ -10,11 +10,11 @@ export default function Gallery() {
   const step = (delta) => setActive((i) => (i + delta + GALLERY.length) % GALLERY.length)
 
   return (
-    <section id="gallery" className="bg-slate-50 py-20">
+    <section id="gallery" className="bg-slate-50 py-14 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading eyebrow="Our work" title="Gallery" />
 
-        <div className="mt-12 grid gap-8 lg:grid-cols-2">
+        <div className="mt-10 grid gap-6 sm:mt-12 lg:grid-cols-2 lg:gap-8">
           <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
             <button type="button" onClick={() => setLightbox(true)} className="block w-full">
               <img
@@ -27,7 +27,7 @@ export default function Gallery() {
               type="button"
               onClick={() => step(-1)}
               aria-label="Previous photo"
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/85 p-2 text-brand-900 shadow hover:bg-white"
+              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/85 p-3 text-brand-900 shadow hover:bg-white"
             >
               <ChevronIcon direction="left" className="h-6 w-6" />
             </button>
@@ -35,7 +35,7 @@ export default function Gallery() {
               type="button"
               onClick={() => step(1)}
               aria-label="Next photo"
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/85 p-2 text-brand-900 shadow hover:bg-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/85 p-3 text-brand-900 shadow hover:bg-white"
             >
               <ChevronIcon className="h-6 w-6" />
             </button>
@@ -63,7 +63,7 @@ export default function Gallery() {
 
       {lightbox && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
           role="dialog"
           aria-modal="true"
           onClick={() => setLightbox(false)}
@@ -71,7 +71,7 @@ export default function Gallery() {
           <button
             type="button"
             aria-label="Close"
-            className="absolute right-5 top-5 text-white"
+            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] flex h-11 w-11 items-center justify-center text-white"
             onClick={() => setLightbox(false)}
           >
             <CloseIcon className="h-8 w-8" />

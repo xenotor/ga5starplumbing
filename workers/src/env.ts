@@ -14,4 +14,11 @@ export interface Env {
   /** Where new-booking notifications go. Unset disables notification. */
   NOTIFY_EMAIL_TO?: string;
   NOTIFY_EMAIL_FROM?: string;
+
+  /**
+   * Turnstile secret for the booking widget. Unset disables the check so a
+   * developer without the secret can still book locally — production sets it,
+   * and `src/lib/turnstile.ts` is the only place that decides.
+   */
+  TURNSTILE_SECRET_KEY?: string;
 }

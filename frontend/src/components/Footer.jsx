@@ -3,8 +3,9 @@ import { FacebookIcon, TwitterIcon, GoogleIcon, MailIcon, PhoneIcon } from './Ic
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 py-14 text-slate-300">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 md:grid-cols-3">
+    // Extra bottom padding on phones clears the fixed MobileCallBar.
+    <footer className="bg-slate-900 pb-28 pt-12 text-slate-300 md:pb-14 md:pt-14">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 md:grid-cols-3 md:gap-10">
         <div>
           <img src="/images/5star.png" alt="Georgia 5 Star Plumbing" className="h-12 w-auto brightness-0 invert" />
           <p className="mt-4 max-w-xs text-sm">
@@ -35,15 +36,10 @@ export default function Footer() {
 
         <div>
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-white">Menu</h3>
-          <ul className="mt-4 space-y-2">
-            <li>
-              <a href="#top" className="hover:text-accent-400">
-                Home
-              </a>
-            </li>
-            {NAV.map((item) => (
+          <ul className="mt-2">
+            {[{ href: '#top', label: 'Home' }, ...NAV].map((item) => (
               <li key={item.href}>
-                <a href={item.href} className="hover:text-accent-400">
+                <a href={item.href} className="flex min-h-11 items-center hover:text-accent-400">
                   {item.label}
                 </a>
               </li>

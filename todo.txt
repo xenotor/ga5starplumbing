@@ -1,10 +1,5 @@
-switch
 
-cloudflare huan - protection of rschedule
 
-optimize for mobile view maintain dekktop
-
-externalize schedule section as componen/module/page so we can have it on different landing pages. with just reference.
 
 connect google calendar for admin
 

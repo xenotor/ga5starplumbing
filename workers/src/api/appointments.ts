@@ -11,6 +11,7 @@ import {
   isValidDateKey,
   zonedParts,
 } from "../lib/schedule";
+import { verifyTurnstile } from "../lib/turnstile";
 
 export const appointmentRoutes = new Hono<{ Bindings: Env }>();
 
@@ -38,6 +39,14 @@ function optional(value: unknown, max: number): string | null {
 function isUsablePhone(phone: string): boolean {
   const digits = phone.replace(/\D/g, "");
   return digits.length >= 10 && digits.length <= 15;
+}
+
+/**
+ * A van has to find it. Not a full address parse — just enough to reject "asap"
+ * and other non-addresses: a street number and something after it.
+ */
+function isUsableAddress(address: string): boolean {
+  return /\d/.test(address) && address.replace(/\s+/g, " ").trim().length >= 8;
 }
 
 /** Confirmed counts per slot for one day. */
@@ -99,9 +108,27 @@ appointmentRoutes.post("/appointments", async (c) => {
   const slotDate = clean(payload.date, 10);
   const slotTime = clean(payload.slot, 5);
 
-  if (!name || !address) return c.json({ error: "missing_contact_details" }, 400);
+  if (!name) return c.json({ error: "missing_name" }, 400);
+  // The shop cannot dispatch a van without both of these, so neither is
+  // optional here or in the form.
   if (!isUsablePhone(phone)) return c.json({ error: "invalid_phone" }, 400);
+  if (!isUsableAddress(address)) return c.json({ error: "invalid_address" }, 400);
   if (!isValidDateKey(slotDate)) return c.json({ error: "invalid_date" }, 400);
+
+  // Before touching D1: a rejected token must cost nothing but the siteverify
+  // round trip.
+  const human = await verifyTurnstile(
+    payload.turnstileToken,
+    c.env.TURNSTILE_SECRET_KEY,
+    c.req.header("cf-connecting-ip"),
+  );
+  if (!human.ok) {
+    recordBookingEvent(c.env, "booking_rejected", { slotDate });
+    return c.json(
+      { error: human.reason === "unavailable" ? "captcha_unavailable" : "captcha_failed" },
+      403,
+    );
+  }
 
   const counts = await bookedCounts(c.env, slotDate);
   if (!isBookable(slotDate, slotTime, counts, new Date(), c.env.BUSINESS_TZ)) {

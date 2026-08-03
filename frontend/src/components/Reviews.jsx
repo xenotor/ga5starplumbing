@@ -21,9 +21,11 @@ export default function Reviews() {
   return (
     <section
       id="reviews"
-      className="bg-white py-20"
+      className="bg-white py-14 sm:py-20"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      // Touch has no hover: a reader who taps a dot should not be yanked on.
+      onTouchStart={() => setPaused(true)}
     >
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
         <div className="flex flex-col items-center">
@@ -40,13 +42,13 @@ export default function Reviews() {
             <ChevronIcon direction="left" className="h-6 w-6" />
           </button>
 
-          <blockquote className="min-h-56 flex-1 rounded-2xl bg-slate-50 p-8">
+          <blockquote className="flex-1 rounded-2xl bg-slate-50 p-6 sm:min-h-56 sm:p-8">
             <div className="flex justify-center gap-1 text-accent-500">
               {Array.from({ length: 5 }, (_, i) => (
                 <StarIcon key={i} className="h-5 w-5" />
               ))}
             </div>
-            <p className="mt-5 text-lg leading-relaxed text-slate-700">“{review.body}”</p>
+            <p className="mt-5 text-base leading-relaxed text-slate-700 sm:text-lg">“{review.body}”</p>
             <footer className="mt-5 font-bold uppercase tracking-wide text-brand-800">— {review.name}</footer>
           </blockquote>
 
@@ -60,15 +62,21 @@ export default function Reviews() {
           </button>
         </div>
 
-        <div className="mt-6 flex justify-center gap-2">
+        {/* The dot is 8px; the button around it is 44px so a thumb can hit it. */}
+        <div className="mt-4 flex justify-center">
           {REVIEWS.map((r, i) => (
             <button
               key={r.name}
               type="button"
               aria-label={`Review ${i + 1}`}
+              aria-current={i === index}
               onClick={() => setIndex(i)}
-              className={`h-2 rounded-full transition-all ${i === index ? 'w-6 bg-brand-600' : 'w-2 bg-slate-300'}`}
-            />
+              className="flex h-11 w-6 items-center justify-center"
+            >
+              <span
+                className={`h-2 rounded-full transition-all ${i === index ? 'w-6 bg-brand-600' : 'w-2 bg-slate-300'}`}
+              />
+            </button>
           ))}
         </div>
 

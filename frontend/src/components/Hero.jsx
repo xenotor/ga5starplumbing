@@ -8,13 +8,17 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_40rem_at_80%_-10%,rgba(51,133,251,0.45),transparent)]"
         aria-hidden="true"
       />
-      <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pb-20 pt-10 sm:px-6 lg:grid-cols-12 lg:pb-28">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pb-14 pt-6 sm:px-6 sm:pb-20 sm:pt-10 lg:grid-cols-12 lg:pb-28">
         <div className="lg:col-span-8">
-          <div className="mb-5 flex items-center gap-1 text-accent-400">
-            {Array.from({ length: 5 }, (_, i) => (
-              <StarIcon key={i} className="h-5 w-5" />
-            ))}
-            <span className="ml-2 text-sm font-medium text-brand-100">Licensed &amp; insured Master Plumber</span>
+          {/* Stars and the credential wrap as two lines on a narrow phone
+              rather than breaking the sentence mid-way beside them. */}
+          <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-accent-400">
+            <span className="flex gap-1">
+              {Array.from({ length: 5 }, (_, i) => (
+                <StarIcon key={i} className="h-5 w-5" />
+              ))}
+            </span>
+            <span className="text-sm font-medium text-brand-100">Licensed &amp; insured Master Plumber</span>
           </div>
 
           <h1 className="text-4xl font-black uppercase leading-tight tracking-tight sm:text-6xl lg:text-7xl">
@@ -29,22 +33,23 @@ export default function Hero() {
             If you are looking for timely and exceptional service, call now or book an appointment.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          {/* Full-width stacked buttons on a phone; inline pills from sm up. */}
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <a
               href="#book"
-              className="rounded-full bg-accent-500 px-7 py-3.5 text-base font-bold uppercase tracking-wide text-brand-950 shadow-lg transition hover:bg-accent-400"
+              className="flex min-h-14 items-center justify-center rounded-full bg-accent-500 px-7 text-base font-bold uppercase tracking-wide text-brand-950 shadow-lg transition hover:bg-accent-400"
             >
               Book an appointment
             </a>
             <a
               href={PHONE_HREF}
-              className="flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-base font-bold tracking-wide text-white transition hover:bg-white/20"
+              className="flex min-h-14 items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 text-base font-bold tracking-wide text-white transition hover:bg-white/20"
             >
               <PhoneIcon /> {PHONE}
             </a>
             <a
               href={`mailto:${EMAIL}`}
-              className="hidden items-center gap-2 rounded-full border border-white/30 px-7 py-3.5 text-base font-medium text-white transition hover:bg-white/10 sm:flex"
+              className="hidden min-h-14 items-center justify-center gap-2 rounded-full border border-white/30 px-7 text-base font-medium text-white transition hover:bg-white/10 sm:flex"
             >
               <MailIcon /> Email us
             </a>

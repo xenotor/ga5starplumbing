@@ -76,7 +76,8 @@ jobs:
           jq -n '{
             ADMIN_TOKEN: env.ADMIN_TOKEN,
             NOTIFY_EMAIL_TO: env.NOTIFY_EMAIL_TO,
-            NOTIFY_EMAIL_FROM: env.NOTIFY_EMAIL_FROM
+            NOTIFY_EMAIL_FROM: env.NOTIFY_EMAIL_FROM,
+            TURNSTILE_SECRET_KEY: env.TURNSTILE_SECRET_KEY
           } | with_entries(select(.value != null and .value != ""))' > /tmp/secrets.json
           npx wrangler secret bulk /tmp/secrets.json
           rm /tmp/secrets.json
@@ -86,6 +87,7 @@ jobs:
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
           NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
           NOTIFY_EMAIL_FROM: ${{ secrets.NOTIFY_EMAIL_FROM }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
 
       - name: Deploy Worker
         run: cd workers && npx wrangler deploy

@@ -1,0 +1,74 @@
+/**
+ * Stylesheet for the standalone booking embed.
+ *
+ * Deliberately NOT `@import 'tailwindcss'`: that pulls in preflight, whose
+ * resets are global and would restyle the host landing page's own headings,
+ * buttons and forms. Theme + utilities only, with the handful of resets the
+ * widget actually needs scoped to its host element.
+ */
+
+/* Declared before anything else: cascade-layer precedence follows first
+   mention, so without this the resets below (a later @layer base) would outrank
+   every utility class and flatten the widget. */
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+/* source(none) + explicit sources: only the widget's own classes, not every
+   utility used elsewhere on the marketing site. */
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+@import '../styles/theme.css';
+
+@source '../booking';
+@source '../components/Icons.jsx';
+@source '../components/SectionHeading.jsx';
+
+@layer base {
+  [data-ga5-booking] {
+    box-sizing: border-box;
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    line-height: 1.5;
+    text-align: left;
+    -webkit-font-smoothing: antialiased;
+    overflow-wrap: break-word;
+  }
+
+  [data-ga5-booking] *,
+  [data-ga5-booking] *::before,
+  [data-ga5-booking] *::after {
+    box-sizing: inherit;
+  }
+
+  [data-ga5-booking] h2,
+  [data-ga5-booking] h3,
+  [data-ga5-booking] p,
+  [data-ga5-booking] form,
+  [data-ga5-booking] blockquote {
+    margin: 0;
+  }
+
+  [data-ga5-booking] button,
+  [data-ga5-booking] input,
+  [data-ga5-booking] select,
+  [data-ga5-booking] textarea {
+    font: inherit;
+    color: inherit;
+    margin: 0;
+    border: 0;
+    background-color: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  [data-ga5-booking] button {
+    cursor: pointer;
+  }
+
+  [data-ga5-booking] a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  [data-ga5-booking] svg {
+    display: block;
+  }
+}

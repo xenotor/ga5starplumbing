@@ -117,9 +117,41 @@ describe("POST /api/appointments", () => {
     await expect(response.json()).resolves.toEqual({ error: "invalid_phone" });
   });
 
-  it("requires a name and a service address", async () => {
-    expect((await post({ ...booking, name: "  " })).status).toBe(400);
-    expect((await post({ ...booking, address: "" })).status).toBe(400);
+  it("requires a name, a dialable phone and an address a van could find", async () => {
+    await expect(post({ ...booking, name: "  " }).then((r) => r.json())).resolves.toEqual({
+      error: "missing_name",
+    });
+    await expect(post({ ...booking, address: "" }).then((r) => r.json())).resolves.toEqual({
+      error: "invalid_address",
+    });
+    // No street number: "asap" and "my house" are not dispatchable.
+    await expect(post({ ...booking, address: "my house" }).then((r) => r.json())).resolves.toEqual({
+      error: "invalid_address",
+    });
+    await expect(post({ ...booking, phone: "" }).then((r) => r.json())).resolves.toEqual({
+      error: "invalid_phone",
+    });
+  });
+
+  it("refuses the booking when Turnstile is configured and no token is sent", async () => {
+    env.TURNSTILE_SECRET_KEY = "0xTEST";
+    try {
+      const response = await post({ ...booking, slot: "08:00" });
+      expect(response.status).toBe(403);
+      await expect(response.json()).resolves.toEqual({ error: "captcha_failed" });
+
+      const row = await env.DB.prepare(
+        "SELECT COUNT(*) AS n FROM appointments WHERE slot_time = '08:00'",
+      ).first<{ n: number }>();
+      expect(row?.n).toBe(0);
+    } finally {
+      delete env.TURNSTILE_SECRET_KEY;
+    }
+  });
+
+  it("books without a token when Turnstile is not configured", async () => {
+    expect(env.TURNSTILE_SECRET_KEY).toBeUndefined();
+    expect((await post({ ...booking, slot: "10:00" })).status).toBe(201);
   });
 
   it("refuses a window the shop does not work", async () => {

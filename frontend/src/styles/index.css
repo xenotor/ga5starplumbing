@@ -1,31 +1,36 @@
 @import 'tailwindcss';
-
-/* Brand palette lifted from the original site: 5-star plumbing blue + wrench steel. */
-@theme {
-  --color-brand-50: #eef6ff;
-  --color-brand-100: #d9ebff;
-  --color-brand-200: #bcdcff;
-  --color-brand-300: #8ec6ff;
-  --color-brand-400: #59a6ff;
-  --color-brand-500: #3385fb;
-  --color-brand-600: #1d66f0;
-  --color-brand-700: #1751dd;
-  --color-brand-800: #1943b3;
-  --color-brand-900: #0f2f7a;
-  --color-brand-950: #0a1f52;
-
-  --color-accent-400: #ffc73d;
-  --color-accent-500: #f5b014;
-
-  --font-display: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
-}
+@import './theme.css';
 
 html {
   scroll-behavior: smooth;
-  /* Sticky header must not swallow anchor targets. */
-  scroll-padding-top: 6rem;
+  /* Sticky header must not swallow anchor targets. The header is shorter on
+     phones, so the offset is too. */
+  scroll-padding-top: 5.5rem;
+  /* Stop iOS Safari from re-flowing text when the phone is turned. */
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: 6.5rem;
+  }
 }
 
 body {
   @apply bg-white text-slate-800 antialiased;
+  /* One long word in a review must not widen the page on a 360px screen. */
+  overflow-wrap: break-word;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
