@@ -13,10 +13,33 @@ index.html  the retired GitHub Pages site, plus web_files/ (see Cutover)
 ## Quick start
 
 ```bash
-make setup      # install workers + frontend dependencies
+make setup      # install dependencies and create .env + workers/.dev.vars
 make run        # build the SPA and serve everything at http://localhost:8787
 make prep       # format check, lint, typecheck, tests, build — run after changes
 ```
+
+Before the first `make run`, seed the local database once:
+`make d1-migrate-local`.
+
+## Local environment
+
+Two files, because they are read by different things. `make env` creates both
+from their committed examples and never overwrites one you have edited; both
+are gitignored.
+
+| File | Read by | Holds |
+| --- | --- | --- |
+| `workers/.dev.vars` | `wrangler dev`, injected as bindings on `env` | Worker runtime secrets: `ADMIN_TOKEN`, `NOTIFY_EMAIL_*` |
+| `.env` | the Makefile, which includes and exports it | tooling settings: `CLOUDFLARE_ACCOUNT_ID`, `WORKER_URL`, `ADMIN_TOKEN` for curl |
+
+The sample values work as-is against a local Worker — `make admin-appointments`
+authenticates because `.env` and `workers/.dev.vars` ship the same placeholder
+token. Neither file feeds production: deploys take their secrets from the
+GitHub `production` environment.
+
+`ENV` and `BUSINESS_TZ` are plain vars in `workers/wrangler.jsonc`, not secrets,
+so they are not duplicated in either file. The frontend reads no `VITE_*`
+variables today; add `frontend/.env.local` if that changes.
 
 `make run` serves the API and the built SPA from one origin, exactly like
 production. For frontend hot reload run `cd frontend && npm run dev` in a second

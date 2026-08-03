@@ -17,3 +17,7 @@ workers/.dev.vars
 
 # Logs
 *.log
+
+# Local developer environment (see .env.example)
+.env
+frontend/.env.local
