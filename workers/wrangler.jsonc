@@ -1,0 +1,51 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ga5starplumbing",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Custom domains are attached only after the DNS cutover is reviewed.
+  // Until then the site is reachable at ga5starplumbing.<subdomain>.workers.dev.
+  // "routes": [
+  //   { "pattern": "ga5starplumbing.com", "custom_domain": true },
+  //   { "pattern": "www.ga5starplumbing.com", "custom_domain": true }
+  // ],
+
+  "workers_dev": true,
+
+  // React SPA served as static assets; the Worker owns /api only, so a plain
+  // page view costs no Worker invocation.
+  "assets": {
+    "directory": "../frontend/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ga5starplumbing",
+      "database_id": "a31df4c8-30e0-4c64-bef1-381fd36205b5",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Booking funnel telemetry keyed by Facebook campaign (see src/lib/analytics.ts).
+  "analytics_engine_datasets": [
+    {
+      "binding": "BOOKING_ANALYTICS",
+      "dataset": "ga5starplumbing_bookings"
+    }
+  ],
+
+  "observability": { "enabled": true },
+
+  "vars": {
+    "ENV": "prod",
+    "BUSINESS_TZ": "America/New_York"
+  }
+  // Secrets: ADMIN_TOKEN, NOTIFY_EMAIL_TO, NOTIFY_EMAIL_FROM (optional),
+  // FACEBOOK_CAPI_TOKEN / FACEBOOK_PIXEL_ID (optional) — set from GitHub Secrets.
+}

@@ -1,0 +1,93 @@
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches: ["main"]
+    # Prose never reaches the Worker bundle; a docs-only push runs no job.
+    paths-ignore:
+      - "**/CLAUDE.md"
+      - "**/AGENTS.md"
+      - "README.md"
+      - "docs/**"
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            workers/package-lock.json
+            frontend/package-lock.json
+      - name: Install dependencies
+        run: make setup
+      - name: Full quality suite
+        run: make prep
+
+  deploy:
+    # Pull requests validate only; nothing ships until the merge lands on main.
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            workers/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../workers && npm ci
+
+      - name: Reject placeholder bindings
+        run: |
+          set -euo pipefail
+          if grep -q 'PLACEHOLDER_RUN_MAKE_D1_CREATE' workers/wrangler.jsonc; then
+            echo "workers/wrangler.jsonc still holds the placeholder D1 id — run 'make d1-create'" >&2
+            exit 1
+          fi
+
+      - name: Build frontend
+        run: cd frontend && npm run build
+
+      - name: Apply D1 migrations
+        run: cd workers && npx wrangler d1 migrations apply ga5starplumbing --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # Production secrets are owned by the GitHub `production` environment.
+      - name: Sync Worker secrets
+        run: |
+          cd workers
+          jq -n '{
+            ADMIN_TOKEN: env.ADMIN_TOKEN,
+            NOTIFY_EMAIL_TO: env.NOTIFY_EMAIL_TO,
+            NOTIFY_EMAIL_FROM: env.NOTIFY_EMAIL_FROM
+          } | with_entries(select(.value != null and .value != ""))' > /tmp/secrets.json
+          npx wrangler secret bulk /tmp/secrets.json
+          rm /tmp/secrets.json
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          NOTIFY_EMAIL_FROM: ${{ secrets.NOTIFY_EMAIL_FROM }}
+
+      - name: Deploy Worker
+        run: cd workers && npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

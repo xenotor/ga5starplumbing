@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+/* Brand palette lifted from the original site: 5-star plumbing blue + wrench steel. */
+@theme {
+  --color-brand-50: #eef6ff;
+  --color-brand-100: #d9ebff;
+  --color-brand-200: #bcdcff;
+  --color-brand-300: #8ec6ff;
+  --color-brand-400: #59a6ff;
+  --color-brand-500: #3385fb;
+  --color-brand-600: #1d66f0;
+  --color-brand-700: #1751dd;
+  --color-brand-800: #1943b3;
+  --color-brand-900: #0f2f7a;
+  --color-brand-950: #0a1f52;
+
+  --color-accent-400: #ffc73d;
+  --color-accent-500: #f5b014;
+
+  --font-display: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Sticky header must not swallow anchor targets. */
+  scroll-padding-top: 6rem;
+}
+
+body {
+  @apply bg-white text-slate-800 antialiased;
+}
