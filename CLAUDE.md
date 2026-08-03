@@ -12,6 +12,7 @@ Hono + D1 behind `/api`.
 ```
 frontend/   React 18, Vite, Tailwind v4 -> frontend/dist, served as Worker assets
 workers/    Hono API on Cloudflare Workers + D1
+acquisitions/  Meta ads tooling, Python + uv. Own CLAUDE.md and docs/
 docs/       one topic per file, see docs/README.md
 ```
 
@@ -64,6 +65,15 @@ before changing booking behaviour, and update it when a rule itself changes.
   slot logic in a route handler.
 - **All date arithmetic runs in `BUSINESS_TZ`**, never the server's zone. A
   customer in another timezone must still see Atlanta mornings.
+- **`acquisitions/` is never deployed and never in `make prep`.** It is a local
+  Python CLI for the Meta ads, excluded from the deploy workflow by
+  `paths-ignore` — CI must not need a Python toolchain to ship the site. It
+  reads production through `GET /api/admin/attribution` and nothing else: no D1
+  client, no Cloudflare credentials. It has its own `CLAUDE.md` and `docs/`, and
+  its own `make ads-*` targets.
+- **The campaign name is the `utm_campaign`.** That one string is the join
+  between Meta spend and D1 bookings; `acquisitions/src/ga5_ads/naming.py`
+  builds both ends and nothing else may format either.
 - **Analytics Engine is switched off** on this account; the binding is commented
   out because deploying with it fails the whole release. `src/lib/analytics.ts`
   already treats it as optional — keep it that way.
@@ -77,3 +87,4 @@ before changing booking behaviour, and update it when a rule itself changes.
 | `make prep` | full quality suite — run after changes |
 | `make deploy` | manual deploy (CI does this on merge to main) |
 | `make d1-migrate-local` | seed the local database |
+| `make ads-setup` / `ads-test` | Meta ads tooling in `acquisitions/` (needs uv) |

@@ -10,6 +10,7 @@ to the code instead of restating it.
 | [scheduling.md](scheduling.md) | business hours, overlap policy, timezone rules |
 | [booking-module.md](booking-module.md) | reusing the scheduler on other landing pages |
 | [attribution.md](attribution.md) | how Facebook ad clicks are tied to bookings |
+| [../acquisitions/](../acquisitions/README.md) | building, running and costing the Meta ads themselves |
 | [notifications.md](notifications.md) | the new-booking email to the shop |
 | [cloudflare-account.md](cloudflare-account.md) | account isolation, resources, credentials |
 | [deployment.md](deployment.md) | CI pipeline, required secrets, manual deploy |

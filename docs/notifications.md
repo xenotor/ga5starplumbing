@@ -26,7 +26,7 @@ Formatting and sending live in `workers/src/lib/notify.ts`;
 
 | Secret | Value |
 | --- | --- |
-| `NOTIFY_EMAIL_TO` | `ivan@mobileblobs.com` (change when the shop takes it over) |
+| `NOTIFY_EMAIL_TO` | `georgia5starplumbing@gmail.com` — the shop's own inbox |
 | `NOTIFY_EMAIL_FROM` | optional; defaults to `bookings@ga5starplumbing.com` |
 
 Set through the GitHub `production` environment like every other secret — see

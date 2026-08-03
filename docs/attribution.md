@@ -22,9 +22,18 @@ Stored on the `appointments` row: `fbclid`, `utm_source`, `utm_medium`,
 `utm_campaign`, `utm_content`, `ad_id`, `campaign_id`, `landing_page`, plus
 `referrer`, `user_agent`, and `country` taken from request headers.
 
+Ad-set and ad granularity came later (`0002_ad_level_attribution.sql`):
+`adset_id`, `adset_name`, `ad_name`, `placement`, and the Meta match keys
+`fbp`, `fbc`, `event_id`. Meta optimizes at the ad set, so a campaign average
+can hide one ad set burning the budget. The match keys are captured now and
+sent nowhere: they exist only in the browser at click time, so a booking stored
+without them can never be matched afterwards.
+
 `GET /api/admin/attribution` groups the last 90 days by campaign and source,
 with a `kept` count of bookings that reached `confirmed`/`completed` — bookings
 per campaign is the number that decides whether an ad set keeps running.
+`?by=adset|ad`, `?days=`, and `?daily=1` regroup it; the ads tooling in
+`acquisitions/` reads it and nothing else out of production.
 
 ## Analytics Engine
 

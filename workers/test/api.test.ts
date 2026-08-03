@@ -110,6 +110,48 @@ describe("POST /api/appointments", () => {
     });
   });
 
+  it("persists the ad-set, ad and Meta match keys", async () => {
+    const response = await post({
+      ...booking,
+      slot: "16:00",
+      attribution: {
+        utm_campaign: "ga5_leads_drain",
+        adset_id: "6789",
+        adset_name: "atlanta-25mi",
+        ad_id: "12345",
+        ad_name: "drain-slow-01",
+        placement: "fb:feed",
+        fbp: "fb.1.1754000000000.987654321",
+        fbc: "fb.1.1754000000000.IwAR-test-click",
+      },
+    });
+    expect(response.status).toBe(201);
+
+    const row = await env.DB.prepare(
+      `SELECT adset_id, adset_name, ad_name, placement, fbp, fbc, event_id, id
+         FROM appointments WHERE slot_time = '16:00'`,
+    ).first<Record<string, unknown>>();
+    expect(row).toMatchObject({
+      adset_id: "6789",
+      adset_name: "atlanta-25mi",
+      ad_name: "drain-slow-01",
+      placement: "fb:feed",
+      fbp: "fb.1.1754000000000.987654321",
+      fbc: "fb.1.1754000000000.IwAR-test-click",
+    });
+    // Without a browser-supplied id the appointment id is the dedup key, so a
+    // conversion sent later can still be matched to a pixel event.
+    expect(row?.event_id).toBe(row?.id);
+  });
+
+  it("takes the browser's event id when the pixel supplied one", async () => {
+    await post({ ...booking, slot: "18:00", eventId: "lead-abc-123" });
+    const row = await env.DB.prepare(
+      "SELECT event_id FROM appointments WHERE slot_time = '18:00'",
+    ).first();
+    expect(row).toMatchObject({ event_id: "lead-abc-123" });
+  });
+
   it("rejects a phone number nobody could dial", async () => {
     const response = await post({ ...booking, phone: "12" });
     expect(response.status).toBe(400);
@@ -294,6 +336,42 @@ describe("admin", () => {
     expect(body.campaigns).toContainEqual(
       expect.objectContaining({ campaign: "atl-drains", bookings: 1 }),
     );
+  });
+
+  it("regroups by ad set, the unit Meta pauses and scales", async () => {
+    await post({
+      ...booking,
+      attribution: { utm_campaign: "ga5_leads_drain", adset_id: "6789", adset_name: "atlanta" },
+    });
+    const response = await SELF.fetch(
+      "https://ga5starplumbing.com/api/admin/attribution?by=adset&days=30",
+      { headers: auth },
+    );
+    const body = (await response.json()) as { campaigns: Record<string, unknown>[]; by: string };
+    expect(body.by).toBe("adset");
+    expect(body.campaigns).toContainEqual(
+      expect.objectContaining({ adset_id: "6789", adset_name: "atlanta", bookings: 1 }),
+    );
+  });
+
+  it("adds the booking date when the sync asks for a daily window", async () => {
+    await post({ ...booking, attribution: { utm_campaign: "ga5_leads_drain" } });
+    const response = await SELF.fetch(
+      "https://ga5starplumbing.com/api/admin/attribution?daily=1&days=7",
+      { headers: auth },
+    );
+    const body = (await response.json()) as { campaigns: { date: string; bookings: number }[] };
+    // Rows carry a UTC booking date so a rolling sync restates a window without
+    // rewriting history.
+    expect(body.campaigns[0].date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it("rejects a grouping it does not know rather than interpolating it", async () => {
+    const response = await SELF.fetch(
+      "https://ga5starplumbing.com/api/admin/attribution?by=1;DROP TABLE appointments",
+      { headers: auth },
+    );
+    expect(response.status).toBe(400);
   });
 });
 

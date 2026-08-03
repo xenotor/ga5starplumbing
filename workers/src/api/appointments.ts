@@ -144,8 +144,15 @@ appointmentRoutes.post("/appointments", async (c) => {
     utm_campaign: optional(attribution.utm_campaign, LIMITS.attribution),
     utm_content: optional(attribution.utm_content, LIMITS.attribution),
     ad_id: optional(attribution.ad_id, LIMITS.attribution),
+    ad_name: optional(attribution.ad_name, LIMITS.attribution),
+    adset_id: optional(attribution.adset_id, LIMITS.attribution),
+    adset_name: optional(attribution.adset_name, LIMITS.attribution),
     campaign_id: optional(attribution.campaign_id, LIMITS.attribution),
+    placement: optional(attribution.placement, LIMITS.attribution),
     landing_page: optional(attribution.landing_page, LIMITS.attribution),
+    // Meta match keys; only the browser can produce them (see the migration).
+    fbp: optional(attribution.fbp, LIMITS.attribution),
+    fbc: optional(attribution.fbc, LIMITS.attribution),
   };
 
   try {
@@ -154,9 +161,11 @@ appointmentRoutes.post("/appointments", async (c) => {
          id, reference, status, slot_date, slot_time,
          name, phone, email, address, service, notes, contact_pref,
          fbclid, utm_source, utm_medium, utm_campaign, utm_content,
-         ad_id, campaign_id, landing_page, referrer, user_agent, country
+         ad_id, campaign_id, landing_page, referrer, user_agent, country,
+         ad_name, adset_id, adset_name, placement, fbp, fbc, event_id
        ) VALUES (?1, ?2, 'pending', ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11,
-                 ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22)`,
+                 ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22,
+                 ?23, ?24, ?25, ?26, ?27, ?28, ?29)`,
     )
       .bind(
         id,
@@ -181,6 +190,16 @@ appointmentRoutes.post("/appointments", async (c) => {
         optional(c.req.header("referer"), LIMITS.attribution),
         optional(c.req.header("user-agent"), LIMITS.attribution),
         country,
+        source.ad_name,
+        source.adset_id,
+        source.adset_name,
+        source.placement,
+        source.fbp,
+        source.fbc,
+        // Dedup key for the day conversions are sent to Meta: whatever the
+        // browser fired its Lead event with, or the appointment id when the
+        // pixel is not installed — both sides must agree on one string.
+        optional(payload.eventId, LIMITS.attribution) ?? id,
       )
       .run();
   } catch {

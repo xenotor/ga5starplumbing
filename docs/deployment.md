@@ -4,8 +4,11 @@
 
 - **every pull request** → `make prep` only.
 - **merge to `main`** → `make prep`, then apply D1 migrations, sync Worker
-  secrets, deploy. Pushes touching only `docs/**`, `todo.txt`, `README.md`, or
-  `CLAUDE.md`/`AGENTS.md` run no job — prose never reaches the Worker bundle.
+  secrets, deploy. Pushes touching only `docs/**`, `todo.txt`, `README.md`,
+  `CLAUDE.md`/`AGENTS.md`, or `acquisitions/**` run no job — prose never reaches
+  the Worker bundle, and the ads tooling is a local CLI that is never deployed
+  ([acquisitions](../acquisitions/README.md)). It has its own suite,
+  `make ads-test`, deliberately outside `make prep` so CI needs no Python.
 
 ## Required secrets
 
