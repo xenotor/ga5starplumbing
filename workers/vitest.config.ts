@@ -14,7 +14,15 @@ export default defineConfig({
       wrangler: { configPath: "./wrangler.jsonc" },
       miniflare: {
         compatibilityFlags: ["nodejs_compat"],
-        bindings: { TEST_MIGRATIONS: migrations, ADMIN_TOKEN: "test-admin-token" },
+        // NOTIFY_EMAIL_TO is blanked so the suite sends no mail by default —
+        // .dev.vars would otherwise leak a recipient in and every booking test
+        // would dump a message file. The notification tests set it themselves.
+        bindings: {
+          TEST_MIGRATIONS: migrations,
+          ADMIN_TOKEN: "test-admin-token",
+          NOTIFY_EMAIL_TO: "",
+          NOTIFY_EMAIL_FROM: "",
+        },
       },
     }),
   ],

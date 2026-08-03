@@ -85,7 +85,21 @@ picks Atlanta mornings, not their own. All date arithmetic runs in
 
 *Enforced in* `workers/src/lib/schedule.ts` and `frontend/src/booking/dates.js`.
 
-## 9. There is one scheduler
+## 9. The shop hears about a booking without going looking
+
+Rule 2 only works if the owner knows there is a call to make. Every booking is
+emailed to them as it is taken, with everything the customer typed and the
+campaign that produced them, so the confirmation call can happen from a phone
+with no dashboard open.
+
+Subordinate to rule 1, like attribution: the email is sent after the booking is
+stored and never fails it. A booking nobody was emailed about is still a
+booking, and still in the owner's list.
+
+*Enforced in* `workers/src/lib/notify.ts`. See
+[notifications.md](notifications.md).
+
+## 10. There is one scheduler
 
 The availability read, the booking write, the site's booking section and any
 landing page embed all derive from the same module. A fork drifts from the slot

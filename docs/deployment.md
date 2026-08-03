@@ -16,7 +16,7 @@ GitHub `production` environment:
 | `CLOUDFLARE_API_TOKEN` | deploy credential for **this project's** account |
 | `CLOUDFLARE_ACCOUNT_ID` | `3424bc39…`, must match the pin in `wrangler.jsonc` |
 | `ADMIN_TOKEN` | Bearer token for `/api/admin/*` |
-| `NOTIFY_EMAIL_TO` / `_FROM` | optional; empty values are filtered out |
+| `NOTIFY_EMAIL_TO` / `_FROM` | new-booking email; unset disables it ([notifications.md](notifications.md)) |
 | `TURNSTILE_SECRET_KEY` | booking bot check; unset disables it ([booking-module.md](booking-module.md)) |
 
 Set them from stdin, not `--body -`, which stores a literal `-`:

@@ -83,7 +83,8 @@ export function daysBetween(fromKey: string, toKey: string): number {
   return Math.round((parse(toKey) - parse(fromKey)) / 86_400_000);
 }
 
-function formatWindow(startHour: number): string {
+/** "2pm – 4pm" for a window start, the wording the customer saw when booking. */
+export function formatWindow(startHour: number): string {
   const label = (hour: number) => {
     const suffix = hour >= 12 ? "pm" : "am";
     const twelve = hour % 12 === 0 ? 12 : hour % 12;

@@ -71,12 +71,21 @@
   //   }
   // ],
 
+  // New-booking notification to the shop (src/lib/notify.ts). The sender domain
+  // must be onboarded to Email Sending — `wrangler email sending enable
+  // ga5starplumbing.com` — and that onboarding touches the zone's SPF/DKIM,
+  // which already carries the shop's Mailgun records. Check before accepting
+  // any DNS change it proposes. Notification is optional at runtime: an unset
+  // NOTIFY_EMAIL_TO disables it and bookings are unaffected.
+  "send_email": [{ "name": "EMAIL" }],
+
   "observability": { "enabled": true },
 
   "vars": {
     "ENV": "prod",
     "BUSINESS_TZ": "America/New_York"
   }
-  // Secrets: ADMIN_TOKEN, NOTIFY_EMAIL_TO, NOTIFY_EMAIL_FROM (optional),
+  // Secrets: ADMIN_TOKEN, NOTIFY_EMAIL_TO (unset disables notification),
+  // NOTIFY_EMAIL_FROM (optional),
   // FACEBOOK_CAPI_TOKEN / FACEBOOK_PIXEL_ID (optional) — set from GitHub Secrets.
 }

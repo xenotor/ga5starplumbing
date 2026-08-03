@@ -23,7 +23,7 @@ React SPA + Hono Worker + D1, one origin.
 | --- | --- |
 | `GET /api/health`, `/api/health/ready` | liveness, D1 ping |
 | `GET /api/availability?date=YYYY-MM-DD` | open arrival windows |
-| `POST /api/appointments` | create booking + attribution |
+| `POST /api/appointments` | create booking + attribution, email the shop |
 | `GET /api/admin/appointments` | owner's list (Bearer `ADMIN_TOKEN`) |
 | `PATCH /api/admin/appointments/:id` | status transition |
 | `GET /api/admin/attribution` | bookings per campaign, 90 days |

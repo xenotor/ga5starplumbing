@@ -15,8 +15,12 @@
 # Generate a real one for production with: openssl rand -hex 32
 ADMIN_TOKEN="local-dev-token"
 
-# Where new-booking notifications will go once notification is wired up.
-# Unset disables notification entirely; leave these as-is for local work.
+# Where the new-booking email goes, and who it comes from. Unset NOTIFY_EMAIL_TO
+# disables notification entirely; a booking is never failed by a mail problem.
+# `wrangler dev` does not deliver anything — it writes each message to a file
+# and prints the path — so these placeholders are fine for local work. In
+# production NOTIFY_EMAIL_FROM must be on a domain onboarded to Email Sending.
+# See docs/notifications.md.
 NOTIFY_EMAIL_TO="dev@example.com"
 NOTIFY_EMAIL_FROM="bookings@example.com"
 

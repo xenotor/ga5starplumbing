@@ -5,6 +5,13 @@ export interface Env {
   /** Absent in tests and local dev; every write to it is best-effort. */
   BOOKING_ANALYTICS?: AnalyticsEngineDataset;
 
+  /**
+   * Cloudflare Email Sending. Absent in tests and local dev (and until the
+   * domain is onboarded), which disables new-booking notification rather than
+   * failing a booking — see `src/lib/notify.ts`.
+   */
+  EMAIL?: SendEmail;
+
   ENV: string;
   /** IANA zone the shop's business hours are expressed in. */
   BUSINESS_TZ: string;
@@ -13,6 +20,7 @@ export interface Env {
   ADMIN_TOKEN?: string;
   /** Where new-booking notifications go. Unset disables notification. */
   NOTIFY_EMAIL_TO?: string;
+  /** Sender address; must be on a domain onboarded to Email Sending. */
   NOTIFY_EMAIL_FROM?: string;
 
   /**

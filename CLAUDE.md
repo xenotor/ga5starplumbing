@@ -35,7 +35,10 @@ before changing booking behaviour, and update it when a rule itself changes.
 - **This project has its own Cloudflare account** and must stay unrelated to any
   other project on this machine. `account_id` is pinned in `workers/wrangler.jsonc`
   so wrangler refuses to act under another account's credentials. Never replace
-  it with a variable. See `docs/cloudflare-account.md`.
+  it with a variable. In particular this machine's interactive `wrangler login`
+  is the owner's *personal* account (astromatlog, `b60dd49c…`) — never let a
+  command for this project run under it. Authenticate from `.env`
+  (`set -a && . ./.env && set +a`). See `docs/cloudflare-account.md`.
 - **`ga5starplumbing.com` is live and served by this Worker.** A bad deploy is
   visible to customers immediately. The `routes` block in `wrangler.jsonc` must
   stay — wrangler syncs triggers each deploy, so dropping it detaches the domain.
@@ -51,6 +54,11 @@ before changing booking behaviour, and update it when a rule itself changes.
   front of the page and never from the browser. The bot worth stopping posts
   straight at the API. `TURNSTILE_SECRET_KEY` unset disables the check (that is
   how local dev runs); a *present* secret must never be bypassable.
+- **The new-booking email is best-effort and post-commit.** It sends through
+  Cloudflare Email Sending from `src/lib/notify.ts`, after the D1 insert and
+  inside `waitUntil`. A mail failure must never turn a stored booking into an
+  error the customer sees. Onboarding the sender domain touches the zone's SPF —
+  see the Mailgun note above and `docs/notifications.md`.
 - **Scheduling rules live in one file**, `workers/src/lib/schedule.ts`. Both the
   availability read and the booking write derive from it — do not reimplement
   slot logic in a route handler.

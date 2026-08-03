@@ -201,6 +201,42 @@ describe("POST /api/appointments", () => {
     }>();
     expect(row?.notes).toHaveLength(2000);
   });
+
+  it("emails the shop the whole booking, and books anyway when mail fails", async () => {
+    const sent: Record<string, unknown>[] = [];
+    env.NOTIFY_EMAIL_TO = "owner@example.com";
+    env.EMAIL = {
+      send: async (message: Record<string, unknown>) => {
+        sent.push(message);
+        return { messageId: "test" };
+      },
+    } as unknown as SendEmail;
+
+    try {
+      const response = await post({
+        ...booking,
+        slot: "16:00",
+        attribution: { utm_campaign: "atl-water-heaters" },
+      });
+      expect(response.status).toBe(201);
+      const { reference } = (await response.json()) as { reference: string };
+
+      expect(sent).toHaveLength(1);
+      expect(sent[0]).toMatchObject({ to: "owner@example.com" });
+      const text = sent[0].text as string;
+      expect(text).toContain(reference);
+      expect(text).toContain(booking.phone);
+      expect(text).toContain(booking.address);
+      expect(text).toContain("atl-water-heaters");
+
+      // A mail outage must not cost the shop a paid-for lead.
+      env.EMAIL = { send: () => Promise.reject(new Error("down")) } as unknown as SendEmail;
+      expect((await post({ ...booking, slot: "18:00" })).status).toBe(201);
+    } finally {
+      delete env.EMAIL;
+      delete env.NOTIFY_EMAIL_TO;
+    }
+  });
 });
 
 describe("admin", () => {

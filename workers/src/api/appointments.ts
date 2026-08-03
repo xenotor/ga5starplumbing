@@ -2,6 +2,7 @@ import { Hono } from "hono";
 
 import type { Env } from "../env";
 import { recordBookingEvent } from "../lib/analytics";
+import { sendBookingNotification } from "../lib/notify";
 import {
   BOOKING_HORIZON_DAYS,
   availabilityFor,
@@ -132,6 +133,21 @@ appointmentRoutes.post("/appointments", async (c) => {
   const id = crypto.randomUUID();
   const code = reference();
 
+  // Captured once: the row and the owner's notification must say the same thing.
+  const email = optional(payload.email, LIMITS.email);
+  const notes = optional(payload.notes, LIMITS.notes);
+  const country = optional(c.req.header("cf-ipcountry"), 8);
+  const source: Record<string, string | null> = {
+    fbclid: optional(attribution.fbclid, LIMITS.attribution),
+    utm_source: optional(attribution.utm_source, LIMITS.attribution),
+    utm_medium: optional(attribution.utm_medium, LIMITS.attribution),
+    utm_campaign: optional(attribution.utm_campaign, LIMITS.attribution),
+    utm_content: optional(attribution.utm_content, LIMITS.attribution),
+    ad_id: optional(attribution.ad_id, LIMITS.attribution),
+    campaign_id: optional(attribution.campaign_id, LIMITS.attribution),
+    landing_page: optional(attribution.landing_page, LIMITS.attribution),
+  };
+
   try {
     await c.env.DB.prepare(
       `INSERT INTO appointments (
@@ -149,22 +165,22 @@ appointmentRoutes.post("/appointments", async (c) => {
         slotTime,
         name,
         phone,
-        optional(payload.email, LIMITS.email),
+        email,
         address,
         service,
-        optional(payload.notes, LIMITS.notes),
+        notes,
         contactPref,
-        optional(attribution.fbclid, LIMITS.attribution),
-        optional(attribution.utm_source, LIMITS.attribution),
-        optional(attribution.utm_medium, LIMITS.attribution),
-        optional(attribution.utm_campaign, LIMITS.attribution),
-        optional(attribution.utm_content, LIMITS.attribution),
-        optional(attribution.ad_id, LIMITS.attribution),
-        optional(attribution.campaign_id, LIMITS.attribution),
-        optional(attribution.landing_page, LIMITS.attribution),
+        source.fbclid,
+        source.utm_source,
+        source.utm_medium,
+        source.utm_campaign,
+        source.utm_content,
+        source.ad_id,
+        source.campaign_id,
+        source.landing_page,
         optional(c.req.header("referer"), LIMITS.attribution),
         optional(c.req.header("user-agent"), LIMITS.attribution),
-        optional(c.req.header("cf-ipcountry"), 8),
+        country,
       )
       .run();
   } catch {
@@ -174,11 +190,28 @@ appointmentRoutes.post("/appointments", async (c) => {
   recordBookingEvent(c.env, "booking_created", {
     slotDate,
     service,
-    campaign: optional(attribution.utm_campaign, LIMITS.attribution) ?? undefined,
-    source:
-      optional(attribution.utm_source, LIMITS.attribution) ??
-      (attribution.fbclid ? "facebook" : undefined),
+    campaign: source.utm_campaign ?? undefined,
+    source: source.utm_source ?? (source.fbclid ? "facebook" : undefined),
   });
+
+  // After the commit and off the response path: the customer should not wait on
+  // a mail round trip, and a mail failure must not undo a booking that exists.
+  c.executionCtx.waitUntil(
+    sendBookingNotification(c.env, {
+      reference: code,
+      slotDate,
+      slotTime,
+      name,
+      phone,
+      email,
+      address,
+      service,
+      notes,
+      contactPref,
+      attribution: source,
+      country,
+    }),
+  );
 
   return c.json({ id, reference: code, status: "pending", date: slotDate, slot: slotTime }, 201);
 });
