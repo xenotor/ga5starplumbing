@@ -1,0 +1,24 @@
+# Node dependencies and tool caches anywhere in the tree
+node_modules/
+
+# Build output
+frontend/dist/
+
+# Wrangler local state
+.wrangler/
+
+# Environment
+workers/.dev.vars
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+
+# Local developer environment (see .env.example)
+.env
+frontend/.env.local
+ga5creds.txt
