@@ -11,16 +11,14 @@
   "compatibility_date": "2026-07-01",
   "compatibility_flags": ["nodejs_compat"],
 
-  // Cutover is blocked, not undecided: attaching these fails with
-  // "Hostname already has externally managed DNS records" [code 100117] while
-  // the apex A records still point at GitHub Pages, and the deploy token has no
-  // DNS permission to clear them. Left commented so deploys stay green; see
-  // docs/cutover.md for the two steps that unblock it. www is a custom domain
+  // Both hostnames are custom domains on this account's zone. These must stay
+  // in the config: wrangler syncs triggers on every deploy, so removing them
+  // would detach the live domain on the next CI run. www is a custom domain
   // rather than a DNS alias so the Worker owns the redirect to the apex.
-  // "routes": [
-  //   { "pattern": "ga5starplumbing.com", "custom_domain": true },
-  //   { "pattern": "www.ga5starplumbing.com", "custom_domain": true }
-  // ],
+  "routes": [
+    { "pattern": "ga5starplumbing.com", "custom_domain": true },
+    { "pattern": "www.ga5starplumbing.com", "custom_domain": true }
+  ],
 
   "workers_dev": true,
 

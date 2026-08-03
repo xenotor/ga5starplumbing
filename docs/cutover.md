@@ -1,48 +1,46 @@
 # Cutover from GitHub Pages
 
-**Status: blocked on token permissions.** `ga5starplumbing.com` still serves the
-old GitHub Pages site.
+**Done.** `ga5starplumbing.com` is served by the Worker. The GitHub Pages site
+is deleted and the legacy `index.html`, `web_files/`, and `CNAME` are gone from
+the repo.
 
-The root `index.html`, `web_files/`, and `CNAME` are kept on purpose — deleting
-them takes the business's website down. They go **after** the Worker serves the
-domain, not before.
+## Final state
 
-## Where it stopped
+| Hostname | Behaviour |
+| --- | --- |
+| `ga5starplumbing.com` | React SPA + `/api`, custom domain on the Worker |
+| `www.ga5starplumbing.com` | 301 to the apex, path and query preserved |
+| `ga5starplumbing.georgia5starplumbing.workers.dev` | still live, useful for testing |
 
-Attaching the custom domains fails:
+## What was done
 
-```
-Hostname 'ga5starplumbing.com' already has externally managed DNS records
-(A, CNAME, etc). Delete them first or try a different hostname. [code: 100117]
-```
+1. Deleted the GitHub Pages web records only — 4 A + 4 AAAA on the apex and the
+   `www` CNAME. The zone also holds Mailgun **MX**, **SPF**, and **DKIM**
+   records; those were explicitly preserved, since deleting them would break the
+   shop's email. Cloudflare replaced the web records with `100::` placeholders
+   when the domains attached.
+2. Attached both hostnames via `PUT /accounts/{id}/workers/domains`.
+3. `gh api -X DELETE repos/xenotor/ga5starplumbing/pages`.
+4. Removed the legacy files.
 
-The apex A records still point at GitHub Pages, and the deploy token cannot read
-or edit DNS (`Zone:DNS` and `Workers Routes` both return `Authentication error`).
+## Keep the routes block
 
-## Unblocking
-
-Add **Zone → DNS → Edit** and **Zone → Workers Routes → Edit** to the API token
-for the `ga5starplumbing.com` zone, or delete the apex/`www` records by hand in
-the dashboard first.
-
-## Steps
-
-1. Uncomment the `routes` block in `workers/wrangler.jsonc`.
-2. `make deploy` — this deletes the GitHub Pages DNS records and attaches
-   `ga5starplumbing.com` and `www.ga5starplumbing.com` to the Worker.
-3. Verify: apex serves the React app, `www` 301s to the apex, `/api/health`
-   answers on the apex.
-4. Disable GitHub Pages:
-   `gh api -X DELETE repos/xenotor/ga5starplumbing/pages`
-5. Delete `index.html`, `web_files/`, and `CNAME`; drop the note from
-   `CLAUDE.md`.
+`routes` in `workers/wrangler.jsonc` must stay. Wrangler syncs triggers on every
+deploy, so removing it would detach the live domain on the next CI run.
 
 ## www redirect
 
-`www` is attached as a custom domain rather than left as a DNS alias so the
-Worker owns the redirect: `src/index.ts` 301s `www` to the apex, preserving path
-and query (an ad click's `fbclid` must survive it). Serving both hostnames would
-split search ranking and ad-landing analytics.
+`www` is a custom domain rather than a DNS alias so the Worker owns the
+redirect: `src/index.ts` 301s to the apex preserving path and query — an ad
+click's `fbclid` has to survive it. Serving both hostnames would split search
+ranking and ad-landing analytics.
 
-This is why `run_worker_first` covers page requests and not just `/api/*` — a
+This is why `run_worker_first` covers page requests and not just `/api/*`: a
 request served straight from assets never reaches the redirect.
+
+## Attaching a domain in future
+
+A hostname with pre-existing DNS records fails with code 100117; the override
+flag does not help. Delete the conflicting records first. Note that **account**
+permissions do not include DNS — the API token needs a **Zone** resource with
+DNS:Edit.

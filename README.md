@@ -8,7 +8,6 @@ arrival window, and the booking carries the ad that paid for it.
 frontend/   React SPA, Tailwind v4, built to frontend/dist and served as Worker assets
 workers/    Hono API on Cloudflare Workers + D1
 docs/       one topic per file
-index.html  the retired GitHub Pages site, plus web_files/ — do not delete yet
 ```
 
 ## Quick start
@@ -30,8 +29,7 @@ make prep              # full quality suite — run after changes
 | [cloudflare account](docs/cloudflare-account.md) | account isolation, resources, credentials |
 | [deployment](docs/deployment.md) | CI pipeline, secrets, manual deploy |
 | [local dev](docs/local-dev.md) | env files, running and testing |
-| [cutover](docs/cutover.md) | moving the live domain off GitHub Pages |
+| [cutover](docs/cutover.md) | how the domain was moved off GitHub Pages |
 
-`ga5starplumbing.com` still serves the old GitHub Pages site. The Worker is live
-at https://ga5starplumbing.georgia5starplumbing.workers.dev — see
-[cutover](docs/cutover.md) before deleting anything at the repo root.
+Live at **https://ga5starplumbing.com** (`www` 301s to the apex). The
+workers.dev URL stays available for testing.

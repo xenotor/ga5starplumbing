@@ -13,7 +13,6 @@ Hono + D1 behind `/api`.
 frontend/   React 18, Vite, Tailwind v4 -> frontend/dist, served as Worker assets
 workers/    Hono API on Cloudflare Workers + D1
 docs/       one topic per file, see docs/README.md
-index.html  retired GitHub Pages site + web_files/ — do not edit, see docs/cutover.md
 ```
 
 ## Working rules
@@ -34,9 +33,11 @@ index.html  retired GitHub Pages site + web_files/ — do not edit, see docs/cut
   other project on this machine. `account_id` is pinned in `workers/wrangler.jsonc`
   so wrangler refuses to act under another account's credentials. Never replace
   it with a variable. See `docs/cloudflare-account.md`.
-- **The live domain still serves GitHub Pages.** The root `index.html`,
-  `web_files/`, and `CNAME` are kept deliberately; deleting them takes the
-  business's website down. See `docs/cutover.md`.
+- **`ga5starplumbing.com` is live and served by this Worker.** A bad deploy is
+  visible to customers immediately. The `routes` block in `wrangler.jsonc` must
+  stay — wrangler syncs triggers each deploy, so dropping it detaches the domain.
+- **The zone carries the shop's Mailgun MX/SPF/DKIM records.** Never delete DNS
+  records without checking type; removing those breaks their email.
 - **Scheduling rules live in one file**, `workers/src/lib/schedule.ts`. Both the
   availability read and the booking write derive from it — do not reimplement
   slot logic in a route handler.

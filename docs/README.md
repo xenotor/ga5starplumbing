@@ -11,4 +11,4 @@ to the code instead of restating it.
 | [cloudflare-account.md](cloudflare-account.md) | account isolation, resources, credentials |
 | [deployment.md](deployment.md) | CI pipeline, required secrets, manual deploy |
 | [local-dev.md](local-dev.md) | env files, running and testing locally |
-| [cutover.md](cutover.md) | moving the live domain off GitHub Pages |
+| [cutover.md](cutover.md) | how the domain was moved off GitHub Pages |

@@ -34,5 +34,6 @@ every deploy, so those two must agree.
 ## Token permissions
 
 Deploying the Worker and running migrations needs Workers Scripts:Edit and
-D1:Edit. Attaching custom domains additionally needs Zone:DNS:Edit and
-Workers Routes:Edit — see [cutover.md](cutover.md).
+D1:Edit, both account-scoped. Managing DNS needs a **Zone** resource with
+DNS:Edit — account permissions alone do not cover it. See
+[cutover.md](cutover.md).
