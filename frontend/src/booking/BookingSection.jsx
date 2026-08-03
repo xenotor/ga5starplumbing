@@ -17,9 +17,11 @@ export default function BookingSection({
 }) {
   return (
     <section id={id} className="bg-brand-950 py-14 text-white sm:py-20">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+      {/* Same max width as the single-column form, so heading, intro and fields
+          all share one left edge. */}
+      <div className="mx-auto max-w-xl px-4 sm:px-6">
         <SectionHeading eyebrow={eyebrow} title={title} invert />
-        {intro && <p className="mt-4 max-w-2xl text-brand-100">{intro}</p>}
+        {intro && <p className="mt-4 text-brand-100">{intro}</p>}
         <BookingWidget className="mt-8 sm:mt-10" {...widgetProps} />
       </div>
     </section>

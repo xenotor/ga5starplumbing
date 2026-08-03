@@ -4,7 +4,6 @@ import type { Env } from "../env";
 import { recordBookingEvent } from "../lib/analytics";
 import {
   BOOKING_HORIZON_DAYS,
-  SLOT_CAPACITY,
   availabilityFor,
   daysBetween,
   isBookable,
@@ -42,27 +41,22 @@ function isUsablePhone(phone: string): boolean {
 }
 
 /**
+ * "text", "call", or "text,call" — at least one, because the shop has to be
+ * able to reach the customer to confirm. Anything else is treated as absent.
+ */
+function contactPreference(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const wanted = value.split(",").map((part) => part.trim());
+  const picked = ["text", "call"].filter((channel) => wanted.includes(channel));
+  return picked.length === 0 ? null : picked.join(",");
+}
+
+/**
  * A van has to find it. Not a full address parse — just enough to reject "asap"
  * and other non-addresses: a street number and something after it.
  */
 function isUsableAddress(address: string): boolean {
   return /\d/.test(address) && address.replace(/\s+/g, " ").trim().length >= 8;
-}
-
-/** Confirmed counts per slot for one day. */
-async function bookedCounts(env: Env, dateKey: string): Promise<Record<string, number>> {
-  const { results } = await env.DB.prepare(
-    `SELECT slot_time, COUNT(*) AS taken
-       FROM appointments
-      WHERE slot_date = ?1 AND status IN ('pending', 'confirmed')
-      GROUP BY slot_time`,
-  )
-    .bind(dateKey)
-    .all<{ slot_time: string; taken: number }>();
-
-  const counts: Record<string, number> = {};
-  for (const row of results ?? []) counts[row.slot_time] = Number(row.taken);
-  return counts;
 }
 
 /** Human-quotable, unambiguous (no O/0/I/1) confirmation code. */
@@ -80,18 +74,13 @@ appointmentRoutes.get("/availability", async (c) => {
   const today = zonedParts(now, c.env.BUSINESS_TZ).dateKey;
   const offset = daysBetween(today, dateKey);
   if (offset < 0 || offset > BOOKING_HORIZON_DAYS) {
-    return c.json({ date: dateKey, slots: [], capacity: SLOT_CAPACITY });
+    return c.json({ date: dateKey, slots: [] });
   }
 
-  const slots = availabilityFor(
-    dateKey,
-    await bookedCounts(c.env, dateKey),
-    now,
-    c.env.BUSINESS_TZ,
-  );
+  const slots = availabilityFor(dateKey, now, c.env.BUSINESS_TZ);
   recordBookingEvent(c.env, "availability_view", { slotDate: dateKey });
 
-  return c.json({ date: dateKey, slots, capacity: SLOT_CAPACITY });
+  return c.json({ date: dateKey, slots });
 });
 
 appointmentRoutes.post("/appointments", async (c) => {
@@ -105,6 +94,7 @@ appointmentRoutes.post("/appointments", async (c) => {
   const phone = clean(payload.phone, LIMITS.phone);
   const address = clean(payload.address, LIMITS.address);
   const service = clean(payload.service, LIMITS.service) || "Something else";
+  const contactPref = contactPreference(payload.contactPref);
   const slotDate = clean(payload.date, 10);
   const slotTime = clean(payload.slot, 5);
 
@@ -113,6 +103,7 @@ appointmentRoutes.post("/appointments", async (c) => {
   // optional here or in the form.
   if (!isUsablePhone(phone)) return c.json({ error: "invalid_phone" }, 400);
   if (!isUsableAddress(address)) return c.json({ error: "invalid_address" }, 400);
+  if (!contactPref) return c.json({ error: "missing_contact_pref" }, 400);
   if (!isValidDateKey(slotDate)) return c.json({ error: "invalid_date" }, 400);
 
   // Before touching D1: a rejected token must cost nothing but the siteverify
@@ -130,8 +121,7 @@ appointmentRoutes.post("/appointments", async (c) => {
     );
   }
 
-  const counts = await bookedCounts(c.env, slotDate);
-  if (!isBookable(slotDate, slotTime, counts, new Date(), c.env.BUSINESS_TZ)) {
+  if (!isBookable(slotDate, slotTime, new Date(), c.env.BUSINESS_TZ)) {
     recordBookingEvent(c.env, "booking_rejected", {
       slotDate,
       campaign: optional(attribution.utm_campaign, LIMITS.attribution) ?? undefined,
@@ -146,11 +136,11 @@ appointmentRoutes.post("/appointments", async (c) => {
     await c.env.DB.prepare(
       `INSERT INTO appointments (
          id, reference, status, slot_date, slot_time,
-         name, phone, email, address, service, notes,
+         name, phone, email, address, service, notes, contact_pref,
          fbclid, utm_source, utm_medium, utm_campaign, utm_content,
          ad_id, campaign_id, landing_page, referrer, user_agent, country
-       ) VALUES (?1, ?2, 'pending', ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10,
-                 ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21)`,
+       ) VALUES (?1, ?2, 'pending', ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11,
+                 ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22)`,
     )
       .bind(
         id,
@@ -163,6 +153,7 @@ appointmentRoutes.post("/appointments", async (c) => {
         address,
         service,
         optional(payload.notes, LIMITS.notes),
+        contactPref,
         optional(attribution.fbclid, LIMITS.attribution),
         optional(attribution.utm_source, LIMITS.attribution),
         optional(attribution.utm_medium, LIMITS.attribution),

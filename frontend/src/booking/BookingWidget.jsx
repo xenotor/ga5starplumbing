@@ -7,7 +7,7 @@
 import { useEffect, useRef } from 'react'
 import { PHONE, PHONE_HREF } from '../content'
 import { CheckIcon, PhoneIcon } from '../components/Icons'
-import { SERVICE_OPTIONS, TURNSTILE_SITE_KEY } from './config'
+import { TURNSTILE_SITE_KEY } from './config'
 import { useBooking } from './useBooking'
 import Turnstile from './Turnstile'
 
@@ -76,29 +76,11 @@ export default function BookingWidget({
   }
 
   return (
-    <form onSubmit={booking.submit} className={`grid gap-8 lg:grid-cols-2 ${className}`}>
-      <div className="min-w-0 space-y-7">
-        <DayPicker booking={booking} />
-        <SlotPicker booking={booking} phone={phone} />
-
-        <div>
-          <label htmlFor="ga5-service" className={LABEL_CLASS}>
-            What do you need?
-          </label>
-          <select
-            id="ga5-service"
-            value={booking.form.service}
-            onChange={booking.updateField('service')}
-            className={FIELD_CLASS}
-          >
-            {SERVICE_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+    // One column at every width: the customer works straight down the page and
+    // never has to hunt across for the next field.
+    <form onSubmit={booking.submit} className={`mx-auto w-full max-w-xl space-y-6 ${className}`}>
+      <DayPicker booking={booking} />
+      <SlotPicker booking={booking} phone={phone} />
 
       <div className="min-w-0 space-y-4">
         <Field
@@ -123,6 +105,7 @@ export default function BookingWidget({
           autoComplete="tel"
           enterKeyHint="next"
         />
+        <ContactPreference booking={booking} />
         <Field
           id="ga5-email"
           label="Email (optional)"
@@ -261,6 +244,63 @@ function SlotPicker({ booking, phone }) {
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * How the owner may open the confirmation. Both start blank — an unticked box
+ * is the only kind the customer actually agreed to — and at least one has to be
+ * picked, or nobody can reach them.
+ */
+function ContactPreference({ booking }) {
+  const error = booking.fieldErrors.contactPref
+  return (
+    <fieldset aria-describedby={error ? 'ga5-contact-error' : undefined}>
+      <legend className={LABEL_CLASS}>
+        How should we reach you?<span className="ml-1 text-accent-400">*</span>
+      </legend>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <Checkbox
+          id="ga5-contact-text"
+          label="Text me"
+          checked={booking.form.contactText}
+          onChange={booking.updateField('contactText')}
+          invalid={Boolean(error)}
+        />
+        <Checkbox
+          id="ga5-contact-call"
+          label="Call me"
+          checked={booking.form.contactCall}
+          onChange={booking.updateField('contactCall')}
+          invalid={Boolean(error)}
+        />
+      </div>
+      {error && (
+        <p id="ga5-contact-error" className="mt-1 text-sm text-red-200">
+          {error}
+        </p>
+      )}
+    </fieldset>
+  )
+}
+
+function Checkbox({ id, label, invalid, ...props }) {
+  return (
+    // The whole tile is the hit target — a bare 16px box is a miss on a phone.
+    <label
+      htmlFor={id}
+      className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border bg-brand-900 px-4 text-base text-white ${
+        invalid ? 'border-red-400' : 'border-white/20'
+      }`}
+    >
+      <input
+        id={id}
+        type="checkbox"
+        {...props}
+        className="h-5 w-5 shrink-0 accent-accent-500"
+      />
+      {label}
+    </label>
   )
 }
 

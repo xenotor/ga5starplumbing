@@ -1,11 +1,9 @@
 import { SELF, env } from "cloudflare:test";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SLOT_CAPACITY } from "../src/lib/schedule";
-
-// Frozen at 2026-08-03 06:00 Atlanta (Monday), before the first window opens,
-// so every weekday slot is bookable regardless of when the suite runs.
-const NOW = new Date("2026-08-03T10:00:00Z");
+// Frozen at 2026-08-03 03:00 Atlanta (Monday), before the 6am window opens, so
+// every weekday slot is bookable regardless of when the suite runs.
+const NOW = new Date("2026-08-03T07:00:00Z");
 const MONDAY = "2026-08-03";
 const TUESDAY = "2026-08-04";
 
@@ -15,6 +13,7 @@ const booking = {
   email: "ada@example.com",
   address: "1 Peachtree St NE, Atlanta GA",
   service: "Water heater",
+  contactPref: "text,call",
   notes: "Leaking from the bottom.",
   date: MONDAY,
   slot: "12:00",
@@ -55,7 +54,7 @@ describe("GET /api/availability", () => {
     );
     expect(response.status).toBe(200);
     const body = (await response.json()) as { slots: { slot: string; available: boolean }[] };
-    expect(body.slots).toHaveLength(5);
+    expect(body.slots).toHaveLength(8);
     expect(body.slots.every((s) => s.available)).toBe(true);
   });
 
@@ -154,29 +153,42 @@ describe("POST /api/appointments", () => {
     expect((await post({ ...booking, slot: "10:00" })).status).toBe(201);
   });
 
+  it("refuses a booking with no way to reach the customer", async () => {
+    for (const contactPref of ["", "email", undefined]) {
+      const response = await post({ ...booking, slot: "14:00", contactPref });
+      expect(response.status).toBe(400);
+      await expect(response.json()).resolves.toEqual({ error: "missing_contact_pref" });
+    }
+  });
+
+  it("stores only the channels the customer picked", async () => {
+    expect((await post({ ...booking, slot: "18:00", contactPref: "text" })).status).toBe(201);
+    const row = await env.DB.prepare(
+      "SELECT contact_pref FROM appointments WHERE slot_time = '18:00'",
+    ).first<{ contact_pref: string }>();
+    expect(row?.contact_pref).toBe("text");
+  });
+
   it("refuses a window the shop does not work", async () => {
     const response = await post({ ...booking, date: "2026-08-09", slot: "10:00" });
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({ error: "slot_unavailable" });
   });
 
-  it("refuses to overbook a full window", async () => {
-    for (let i = 0; i < SLOT_CAPACITY; i += 1) {
+  it("takes a third booking into an already-booked window", async () => {
+    // Overlap is intentional — a paid click must never be turned away.
+    for (let i = 0; i < 3; i += 1) {
       expect((await post({ ...booking, date: TUESDAY, slot: "10:00" })).status).toBe(201);
     }
-    const overflow = await post({ ...booking, date: TUESDAY, slot: "10:00" });
-    expect(overflow.status).toBe(409);
   });
 
-  it("drops a full window from the next availability read", async () => {
-    for (let i = 0; i < SLOT_CAPACITY; i += 1) {
-      await post({ ...booking, date: TUESDAY, slot: "08:00" });
-    }
+  it("keeps a booked window open in the next availability read", async () => {
+    await post({ ...booking, date: TUESDAY, slot: "08:00" });
     const response = await SELF.fetch(
       `https://ga5starplumbing.com/api/availability?date=${TUESDAY}`,
     );
     const body = (await response.json()) as { slots: { slot: string; available: boolean }[] };
-    expect(body.slots.find((s) => s.slot === "08:00")?.available).toBe(false);
+    expect(body.slots.find((s) => s.slot === "08:00")?.available).toBe(true);
   });
 
   it("truncates oversized free text rather than rejecting the lead", async () => {

@@ -39,7 +39,8 @@ routes are deliberately left same-origin.
 
 ## Data
 
-One table, `appointments` (`workers/migrations/0000_initial_schema.sql`):
-booking details, `status`, and the ad fields from
+One table, `appointments` (`workers/migrations/`): booking details,
+`contact_pref` (`text`, `call`, or `text,call`), `status`, and the ad fields
+from
 [attribution.md](attribution.md). Indexed for the three real queries — one day's
 bookings, the owner's recent list, and per-campaign totals.

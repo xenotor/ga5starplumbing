@@ -4,15 +4,6 @@
  * origin without forking the component.
  */
 
-export const SERVICE_OPTIONS = [
-  'Emergency / leak',
-  'Installation & repair',
-  'Water heater',
-  'Bathroom remodel',
-  'Drain cleaning',
-  'Something else',
-]
-
 /** Must match `BUSINESS_TZ` in the Worker — the day strip has to show Atlanta days. */
 export const BUSINESS_TZ = 'America/New_York'
 

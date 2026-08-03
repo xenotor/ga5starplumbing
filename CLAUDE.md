@@ -29,6 +29,9 @@ docs/       one topic per file, see docs/README.md
 
 ## Constraints that are not obvious from the code
 
+`docs/RULES.md` holds the business rules these constraints serve — read it
+before changing booking behaviour, and update it when a rule itself changes.
+
 - **This project has its own Cloudflare account** and must stay unrelated to any
   other project on this machine. `account_id` is pinned in `workers/wrangler.jsonc`
   so wrangler refuses to act under another account's credentials. Never replace

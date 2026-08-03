@@ -6,14 +6,16 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getAttribution } from '../lib/attribution'
-import { HORIZON_DAYS, SERVICE_OPTIONS } from './config'
+import { HORIZON_DAYS } from './config'
 import { upcomingDays } from './dates'
+import { maskSlots, rememberBooking } from './localSlots'
 
 const ERRORS = {
   slot_unavailable: 'That time was just taken. Please pick another.',
   invalid_phone: 'That phone number does not look right — we need 10 digits.',
   invalid_address: 'We need a street address to send a van to.',
   missing_name: 'Please tell us your name.',
+  missing_contact_pref: 'Please tell us whether we can text you, call you, or both.',
   captcha_failed: 'The bot check did not pass. Please try it again.',
   captcha_unavailable: 'We could not run the bot check. Please try again, or call us.',
 }
@@ -30,6 +32,9 @@ export function validate(form) {
   if (!form.phone.trim()) problems.phone = 'We need a phone number to confirm your booking.'
   else if (digits.length < 10 || digits.length > 15) problems.phone = 'That does not look like a full phone number.'
 
+  if (!form.contactText && !form.contactCall)
+    problems.contactPref = 'Pick at least one so we can confirm your booking.'
+
   const address = form.address.replace(/\s+/g, ' ').trim()
   if (!address) problems.address = 'We need the address to send a van to.'
   else if (!/\d/.test(address) || address.length < 8)
@@ -42,8 +47,9 @@ export const emptyForm = {
   name: '',
   phone: '',
   email: '',
+  contactText: false,
+  contactCall: false,
   address: '',
-  service: SERVICE_OPTIONS[0],
   notes: '',
 }
 
@@ -73,7 +79,8 @@ export function useBooking({ apiBase = '', days = HORIZON_DAYS, requireCaptcha =
         if (!response.ok) throw new Error('availability')
         const data = await response.json()
         if (id !== requestId.current) return
-        setSlots(data.slots || [])
+        // The Worker never closes a window; the greyed-out ones are added here.
+        setSlots(maskSlots(forDate, data.slots || []))
         setError('')
       } catch (err) {
         if (err.name === 'AbortError' || id !== requestId.current) return
@@ -95,11 +102,15 @@ export function useBooking({ apiBase = '', days = HORIZON_DAYS, requireCaptcha =
 
   const updateField = useCallback(
     (field) => (event) => {
-      const { value } = event.target
-      setForm((f) => ({ ...f, [field]: value }))
+      const { checked, type, value } = event.target
+      setForm((f) => ({ ...f, [field]: type === 'checkbox' ? checked : value }))
       // Clear a field's complaint as soon as the customer edits it; re-checking
-      // mid-typing would flag every half-entered phone number.
-      setFieldErrors((problems) => (problems[field] ? { ...problems, [field]: undefined } : problems))
+      // mid-typing would flag every half-entered phone number. The two contact
+      // boxes share one error, so either of them clears it.
+      const errorKey = field === 'contactText' || field === 'contactCall' ? 'contactPref' : field
+      setFieldErrors((problems) =>
+        problems[errorKey] ? { ...problems, [errorKey]: undefined } : problems,
+      )
     },
     [],
   )
@@ -132,6 +143,9 @@ export function useBooking({ apiBase = '', days = HORIZON_DAYS, requireCaptcha =
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
             ...form,
+            contactPref: [form.contactText && 'text', form.contactCall && 'call']
+              .filter(Boolean)
+              .join(','),
             date,
             slot,
             turnstileToken: captchaToken,
@@ -140,11 +154,13 @@ export function useBooking({ apiBase = '', days = HORIZON_DAYS, requireCaptcha =
         })
         const data = await response.json().catch(() => ({}))
         if (!response.ok) throw new Error(data.error || 'booking_failed')
+        // So a second booking from this browser sees the window as taken.
+        rememberBooking(date, slot)
         setConfirmed(data)
         setForm(emptyForm)
         setSlot('')
         setFieldErrors({})
-        // A taken slot must disappear for whoever books next.
+        // Re-read so the window they just took comes back masked.
         loadSlots(date)
         return data
       } catch (err) {

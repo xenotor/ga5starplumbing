@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  SLOT_CAPACITY,
   availabilityFor,
   daysBetween,
   isBookable,
@@ -18,9 +17,9 @@ const MONDAY = "2026-08-03";
 const SATURDAY = "2026-08-08";
 const SUNDAY = "2026-08-09";
 
-/** 06:00 in Atlanta on the given day — before any window opens. */
+/** 03:00 in Atlanta on the given day — before any window opens. */
 function earlyMorning(dateKey: string): Date {
-  return new Date(`${dateKey}T10:00:00Z`); // EDT = UTC-4
+  return new Date(`${dateKey}T07:00:00Z`); // EDT = UTC-4
 }
 
 describe("date keys", () => {
@@ -41,32 +40,32 @@ describe("date keys", () => {
 });
 
 describe("business hours", () => {
-  it("offers five weekday windows, two on Saturday, none on Sunday", () => {
+  it("runs 6am to 10pm every day but Sunday", () => {
     expect(weekdayOf(MONDAY)).toBe(1);
-    expect(windowsFor(MONDAY)).toHaveLength(5);
-    expect(windowsFor(SATURDAY)).toHaveLength(2);
+    expect(windowsFor(MONDAY)).toHaveLength(8);
+    expect(windowsFor(SATURDAY)).toHaveLength(8);
     expect(windowsFor(SUNDAY)).toHaveLength(0);
   });
 
   it("labels windows as two-hour arrival ranges", () => {
-    const slots = availabilityFor(MONDAY, {}, earlyMorning(MONDAY), TZ);
-    expect(slots[0]).toMatchObject({ slot: "08:00", label: "8am – 10am", available: true });
-    expect(slots.at(-1)).toMatchObject({ slot: "16:00", label: "4pm – 6pm" });
+    const slots = availabilityFor(MONDAY, earlyMorning(MONDAY), TZ);
+    expect(slots[0]).toMatchObject({ slot: "06:00", label: "6am – 8am", available: true });
+    expect(slots.at(-1)).toMatchObject({ slot: "20:00", label: "8pm – 10pm", available: true });
   });
 });
 
 describe("availability", () => {
-  it("closes a window once capacity is reached", () => {
-    const booked = { "08:00": SLOT_CAPACITY, "10:00": SLOT_CAPACITY - 1 };
-    const slots = availabilityFor(MONDAY, booked, earlyMorning(MONDAY), TZ);
-    expect(slots.find((s) => s.slot === "08:00")?.available).toBe(false);
-    expect(slots.find((s) => s.slot === "10:00")?.available).toBe(true);
+  it("keeps a window open no matter how many bookings it already holds", () => {
+    // Deliberate: paid traffic must always be able to book, and the owner
+    // resolves a genuine collision on the confirmation call.
+    const slots = availabilityFor(MONDAY, earlyMorning(MONDAY), TZ);
+    expect(slots.every((s) => s.available)).toBe(true);
   });
 
   it("hides same-day windows inside the two-hour lead time", () => {
     // 09:30 Atlanta: the 10am window is 30 minutes out, the noon one is fine.
     const now = new Date(`${MONDAY}T13:30:00Z`);
-    const slots = availabilityFor(MONDAY, {}, now, TZ);
+    const slots = availabilityFor(MONDAY, now, TZ);
     expect(slots.find((s) => s.slot === "08:00")?.available).toBe(false);
     expect(slots.find((s) => s.slot === "10:00")?.available).toBe(false);
     expect(slots.find((s) => s.slot === "12:00")?.available).toBe(true);
@@ -74,7 +73,7 @@ describe("availability", () => {
 
   it("marks every window of a past day unavailable", () => {
     const now = new Date("2026-08-05T13:00:00Z");
-    for (const slot of availabilityFor(MONDAY, {}, now, TZ)) expect(slot.available).toBe(false);
+    for (const slot of availabilityFor(MONDAY, now, TZ)) expect(slot.available).toBe(false);
   });
 
   it("reads wall-clock time in the shop's zone, not UTC", () => {
@@ -90,20 +89,16 @@ describe("isBookable", () => {
   const now = earlyMorning(MONDAY);
 
   it("accepts an open window inside the horizon", () => {
-    expect(isBookable(MONDAY, "08:00", {}, now, TZ)).toBe(true);
-  });
-
-  it("rejects a full window", () => {
-    expect(isBookable(MONDAY, "08:00", { "08:00": SLOT_CAPACITY }, now, TZ)).toBe(false);
+    expect(isBookable(MONDAY, "08:00", now, TZ)).toBe(true);
   });
 
   it("rejects a window the shop does not offer", () => {
-    expect(isBookable(MONDAY, "07:00", {}, now, TZ)).toBe(false);
-    expect(isBookable(SUNDAY, "10:00", {}, now, TZ)).toBe(false);
-    expect(isBookable(SATURDAY, "16:00", {}, now, TZ)).toBe(false);
+    expect(isBookable(MONDAY, "07:00", now, TZ)).toBe(false);
+    expect(isBookable(SUNDAY, "10:00", now, TZ)).toBe(false);
+    expect(isBookable(MONDAY, "22:00", now, TZ)).toBe(false);
   });
 
   it("rejects dates beyond the booking horizon", () => {
-    expect(isBookable("2026-09-30", "08:00", {}, now, TZ)).toBe(false);
+    expect(isBookable("2026-09-30", "08:00", now, TZ)).toBe(false);
   });
 });

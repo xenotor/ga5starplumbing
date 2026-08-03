@@ -7,19 +7,19 @@
  * another zone must still see Atlanta mornings.
  */
 
-/** Two-hour windows by ISO weekday (0 = Sunday). Sunday is closed. */
+/** Two-hour windows, 6am to 10pm. */
+const DAY_WINDOWS: readonly number[] = [6, 8, 10, 12, 14, 16, 18, 20];
+
+/** Windows by ISO weekday (0 = Sunday). Sunday is closed. */
 const WINDOWS: Record<number, readonly number[]> = {
   0: [],
-  1: [8, 10, 12, 14, 16],
-  2: [8, 10, 12, 14, 16],
-  3: [8, 10, 12, 14, 16],
-  4: [8, 10, 12, 14, 16],
-  5: [8, 10, 12, 14, 16],
-  6: [9, 11],
+  1: DAY_WINDOWS,
+  2: DAY_WINDOWS,
+  3: DAY_WINDOWS,
+  4: DAY_WINDOWS,
+  5: DAY_WINDOWS,
+  6: DAY_WINDOWS,
 };
-
-/** Crews that can be dispatched into the same window. */
-export const SLOT_CAPACITY = 2;
 
 /** How far ahead of the window start a booking must land, in hours. */
 const LEAD_TIME_HOURS = 2;
@@ -104,43 +104,30 @@ export function windowsFor(dateKey: string): readonly number[] {
 /**
  * Public availability for a day.
  *
- * `booked` maps slot key -> confirmed count. A window is unavailable when it is
- * full, in the past, or inside the lead time.
+ * Existing bookings deliberately do not close a window. Ads are paid for per
+ * click, so a customer who wants 2pm gets 2pm; the owner sorts out a genuine
+ * double-booking on the confirmation call. Only time itself closes a window.
  */
-export function availabilityFor(
-  dateKey: string,
-  booked: Record<string, number>,
-  now: Date,
-  timeZone: string,
-): Slot[] {
+export function availabilityFor(dateKey: string, now: Date, timeZone: string): Slot[] {
   const today = zonedParts(now, timeZone);
   const offset = daysBetween(today.dateKey, dateKey);
 
   return windowsFor(dateKey).map((startHour) => {
     const key = slotKey(startHour);
-    const full = (booked[key] ?? 0) >= SLOT_CAPACITY;
     const tooSoon = offset === 0 && today.hour + today.minute / 60 > startHour - LEAD_TIME_HOURS;
     const past = offset < 0;
     return {
       slot: key,
       label: formatWindow(startHour),
-      available: !full && !tooSoon && !past,
+      available: !tooSoon && !past,
     };
   });
 }
 
 /** Guard for booking writes: the slot must exist and still be open right now. */
-export function isBookable(
-  dateKey: string,
-  slot: string,
-  booked: Record<string, number>,
-  now: Date,
-  timeZone: string,
-): boolean {
+export function isBookable(dateKey: string, slot: string, now: Date, timeZone: string): boolean {
   const today = zonedParts(now, timeZone);
   const offset = daysBetween(today.dateKey, dateKey);
   if (offset < 0 || offset > BOOKING_HORIZON_DAYS) return false;
-  return availabilityFor(dateKey, booked, now, timeZone).some(
-    (s) => s.slot === slot && s.available,
-  );
+  return availabilityFor(dateKey, now, timeZone).some((s) => s.slot === slot && s.available);
 }

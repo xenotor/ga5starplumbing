@@ -1,6 +1,12 @@
 import { emptyForm, validate } from './useBooking'
 
-const good = { ...emptyForm, name: 'Dana Kim', phone: '(404) 555-0134', address: '12 Peachtree St NE' }
+const good = {
+  ...emptyForm,
+  name: 'Dana Kim',
+  phone: '(404) 555-0134',
+  address: '12 Peachtree St NE',
+  contactCall: true,
+}
 
 it('accepts a complete booking', () => {
   expect(validate(good)).toEqual({})
@@ -40,4 +46,17 @@ describe('address', () => {
 
 it('leaves email optional', () => {
   expect(validate({ ...good, email: '' })).toEqual({})
+})
+
+describe('contact preference', () => {
+  it('needs at least one channel', () => {
+    expect(validate({ ...good, contactText: false, contactCall: false })).toHaveProperty(
+      'contactPref',
+    )
+  })
+
+  it('accepts either one on its own', () => {
+    expect(validate({ ...good, contactText: true, contactCall: false })).toEqual({})
+    expect(validate({ ...good, contactText: false, contactCall: true })).toEqual({})
+  })
 })

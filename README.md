@@ -24,8 +24,9 @@ make prep              # full quality suite — run after changes
 
 | | |
 | --- | --- |
+| [business rules](docs/RULES.md) | the rules the code serves — read first |
 | [architecture](docs/architecture.md) | request routing, API surface, data model |
-| [scheduling](docs/scheduling.md) | business hours, capacity, timezone rules |
+| [scheduling](docs/scheduling.md) | business hours, overlap policy, timezone rules |
 | [booking module](docs/booking-module.md) | reusing the scheduler on other landing pages |
 | [attribution](docs/attribution.md) | tying Facebook ad clicks to bookings |
 | [cloudflare account](docs/cloudflare-account.md) | account isolation, resources, credentials |

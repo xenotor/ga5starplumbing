@@ -46,6 +46,7 @@ async function fillAndSubmit(user) {
   await user.type(screen.getByLabelText(/^Name/), 'Dana Kim')
   await user.type(screen.getByLabelText(/^Phone/), '4045551234')
   await user.type(screen.getByLabelText(/^Service address/), '12 Peachtree St NE')
+  await user.click(screen.getByLabelText(/call me/i))
   await user.click(screen.getByRole('button', { name: /confirm appointment/i }))
 }
 

@@ -23,6 +23,9 @@ async function fillContactDetails(user) {
   await user.type(screen.getByLabelText(/^Name/), 'Dana Kim')
   await user.type(screen.getByLabelText(/^Phone/), '4045551234')
   await user.type(screen.getByLabelText(/^Service address/), '12 Peachtree St')
+  // Both contact boxes start blank, so every booking has to pick one.
+  await user.click(screen.getByLabelText(/text me/i))
+  await user.click(screen.getByLabelText(/call me/i))
 }
 
 // The bot check is exercised in its own file; here it is switched off so the
@@ -57,7 +60,11 @@ it('books the selected day and slot', async () => {
   expect(screen.getByText('AB2C4D')).toBeInTheDocument()
 
   const post = global.fetch.mock.calls.find(([, init]) => init?.method === 'POST')
-  expect(JSON.parse(post[1].body)).toMatchObject({ slot: '08:00', name: 'Dana Kim' })
+  expect(JSON.parse(post[1].body)).toMatchObject({
+    slot: '08:00',
+    name: 'Dana Kim',
+    contactPref: 'text,call',
+  })
 })
 
 it('refuses to submit without a time window', async () => {
@@ -92,4 +99,33 @@ it('sends availability and booking to the configured origin', async () => {
       expect.anything(),
     ),
   )
+})
+
+it('sends only the contact channels left ticked', async () => {
+  const user = userEvent.setup()
+  renderWidget()
+
+  await user.click(await screen.findByRole('button', { name: '8:00 – 10:00 AM' }))
+  await fillContactDetails(user)
+  await user.click(screen.getByLabelText(/text me/i)) // leaves only "Call me"
+  await user.click(screen.getByRole('button', { name: /confirm appointment/i }))
+
+  const post = await waitFor(() =>
+    global.fetch.mock.calls.find(([, init]) => init?.method === 'POST'),
+  )
+  expect(JSON.parse(post[1].body).contactPref).toBe('call')
+})
+
+it('will not submit with no way to reach the customer', async () => {
+  const user = userEvent.setup()
+  renderWidget()
+
+  await user.click(await screen.findByRole('button', { name: '8:00 – 10:00 AM' }))
+  await fillContactDetails(user)
+  await user.click(screen.getByLabelText(/text me/i)) // untick both again
+  await user.click(screen.getByLabelText(/call me/i))
+  await user.click(screen.getByRole('button', { name: /confirm appointment/i }))
+
+  expect(await screen.findByText(/pick at least one/i)).toBeInTheDocument()
+  expect(global.fetch.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false)
 })
