@@ -11,8 +11,12 @@
   "compatibility_date": "2026-07-01",
   "compatibility_flags": ["nodejs_compat"],
 
-  // Custom domains are attached only after the DNS cutover is reviewed.
-  // Until then the site is reachable at ga5starplumbing.<subdomain>.workers.dev.
+  // Cutover is blocked, not undecided: attaching these fails with
+  // "Hostname already has externally managed DNS records" [code 100117] while
+  // the apex A records still point at GitHub Pages, and the deploy token has no
+  // DNS permission to clear them. Left commented so deploys stay green; see
+  // docs/cutover.md for the two steps that unblock it. www is a custom domain
+  // rather than a DNS alias so the Worker owns the redirect to the apex.
   // "routes": [
   //   { "pattern": "ga5starplumbing.com", "custom_domain": true },
   //   { "pattern": "www.ga5starplumbing.com", "custom_domain": true }
@@ -20,13 +24,24 @@
 
   "workers_dev": true,
 
-  // React SPA served as static assets; the Worker owns /api only, so a plain
-  // page view costs no Worker invocation.
+  // React SPA served as static assets, with the Worker in front of page
+  // requests (see run_worker_first below).
   "assets": {
     "directory": "../frontend/dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"]
+    // Page requests run the Worker first so the www -> apex redirect in
+    // src/index.ts actually fires; a request served straight from assets never
+    // reaches our code. The negative rules keep that cost off static files:
+    // hashed bundles and images are served by the asset worker for free, so a
+    // page view costs one invocation rather than one per subresource.
+    "run_worker_first": [
+      "/*",
+      "!/assets/*",
+      "!/images/*",
+      "!/favicon.ico",
+      "!/robots.txt"
+    ]
   },
 
   "d1_databases": [

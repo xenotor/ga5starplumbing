@@ -216,3 +216,25 @@ describe("admin", () => {
     );
   });
 });
+
+describe("canonical host", () => {
+  it("redirects www to the apex, preserving path and query", async () => {
+    const response = await SELF.fetch("https://www.ga5starplumbing.com/?fbclid=abc", {
+      redirect: "manual",
+    });
+    expect(response.status).toBe(301);
+    expect(response.headers.get("location")).toBe("https://ga5starplumbing.com/?fbclid=abc");
+  });
+
+  it("redirects www API calls too, rather than serving two origins", async () => {
+    const response = await SELF.fetch("https://www.ga5starplumbing.com/api/health", {
+      redirect: "manual",
+    });
+    expect(response.status).toBe(301);
+  });
+
+  it("serves the apex directly", async () => {
+    const response = await SELF.fetch("https://ga5starplumbing.com/api/health");
+    expect(response.status).toBe(200);
+  });
+});

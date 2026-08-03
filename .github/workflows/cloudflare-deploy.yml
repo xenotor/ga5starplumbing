@@ -5,10 +5,11 @@ on:
     branches: ["main"]
     # Prose never reaches the Worker bundle; a docs-only push runs no job.
     paths-ignore:
+      - "docs/**"
+      - "todo.txt"
       - "**/CLAUDE.md"
       - "**/AGENTS.md"
       - "README.md"
-      - "docs/**"
   pull_request:
     branches: ["main"]
   workflow_dispatch:
