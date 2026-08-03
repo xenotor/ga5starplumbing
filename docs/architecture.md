@@ -26,7 +26,7 @@ React SPA + Hono Worker + D1, one origin.
 | `POST /api/appointments` | create booking + attribution, email the shop |
 | `GET /api/admin/appointments` | owner's list (Bearer `ADMIN_TOKEN`) |
 | `PATCH /api/admin/appointments/:id` | status transition |
-| `GET /api/admin/attribution` | bookings per campaign, 90 days |
+| `GET /api/admin/attribution` | bookings per campaign, ad set or ad (`by`, `days`, `daily`) |
 
 Admin auth is a single bearer token compared in constant time. An unset
 `ADMIN_TOKEN` returns 503 — it locks the routes rather than opening them.
@@ -42,5 +42,5 @@ routes are deliberately left same-origin.
 One table, `appointments` (`workers/migrations/`): booking details,
 `contact_pref` (`text`, `call`, or `text,call`), `status`, and the ad fields
 from
-[attribution.md](attribution.md). Indexed for the three real queries — one day's
-bookings, the owner's recent list, and per-campaign totals.
+[attribution.md](attribution.md). Indexed for the four real queries — one day's
+bookings, the owner's recent list, per-campaign totals, and per-ad-set totals.

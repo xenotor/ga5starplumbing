@@ -1,0 +1,35 @@
+{
+  "_comment": "Example spec. Targeting is a 25-mile radius on Atlanta because a van has to drive it; widen only as far as the shop will actually travel.",
+  "objective": "OUTCOME_LEADS",
+  "objective_slug": "leads",
+  "service": "drain",
+  "path": "/book",
+  "daily_budget_cents": 3000,
+  "adsets": [
+    {
+      "name": "atlanta-25mi-homeowners",
+      "optimization_goal": "LINK_CLICKS",
+      "targeting": {
+        "geo_locations": {
+          "custom_locations": [
+            { "latitude": 33.749, "longitude": -84.388, "radius": 25, "distance_unit": "mile" }
+          ]
+        },
+        "age_min": 28,
+        "age_max": 65,
+        "publisher_platforms": ["facebook", "instagram"],
+        "facebook_positions": ["feed"],
+        "instagram_positions": ["stream"]
+      },
+      "ads": [
+        {
+          "name": "drain-slow-01",
+          "headline": "Slow drain? Book a visit today",
+          "message": "Atlanta drains cleared same day. Pick a time online — we call to confirm.",
+          "cta": "BOOK_TRAVEL",
+          "image": "assets/drain-01.jpg"
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-.PHONY: help env setup run build test prep frontend-install frontend-build d1-create d1-migrate d1-migrate-local secrets-push deploy admin-appointments
+.PHONY: help env setup run build test prep frontend-install frontend-build d1-create d1-migrate d1-migrate-local secrets-push deploy admin-appointments ads-setup ads-test ads-report
 
 .DEFAULT_GOAL := help
 
@@ -31,6 +31,9 @@ help:
 	@echo "  make secrets-push     - Push workers/.dev.vars to the Worker"
 	@echo "  make admin-appointments - List bookings at WORKER_URL using ADMIN_TOKEN"
 	@echo "  make deploy           - Build + deploy the Worker (CI does this on merge)"
+	@echo "  make ads-setup        - Install the Meta ads tooling in acquisitions/ (needs uv)"
+	@echo "  make ads-test         - Lint + test the ads tooling (not part of prep)"
+	@echo "  make ads-report       - Campaign efficiency report"
 	@echo ""
 	@echo "Local dev: http://localhost:8787 (wrangler dev serves API + built SPA)"
 
@@ -101,3 +104,15 @@ prep: workers/node_modules frontend/node_modules
 
 setup: workers/node_modules frontend/node_modules env
 	@echo "Setup complete."
+
+# Meta ads tooling (acquisitions/). Deliberately outside `prep` and outside the
+# deploy workflow: it is a local Python CLI that never reaches the Worker, and
+# CI should not need a Python toolchain to ship the site.
+ads-setup:
+	cd acquisitions && uv sync && { test -f .env || cp .env.example .env; }
+
+ads-test:
+	cd acquisitions && uv run ruff format --check . && uv run ruff check . && uv run pytest -q
+
+ads-report:
+	cd acquisitions && uv run ga5ads report

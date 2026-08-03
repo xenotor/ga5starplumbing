@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+reports/
+.env
+# Creative source images are large binaries and live outside git.
+assets/
+# The campaign metrics DB is intentionally version-controlled (root ignores *.db).
+!src/data/campaigns.db

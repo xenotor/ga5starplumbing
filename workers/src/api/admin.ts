@@ -57,18 +57,63 @@ adminRoutes.patch("/appointments/:id", async (c) => {
   return c.json({ id: c.req.param("id"), status: body.status });
 });
 
-/** Bookings per campaign — the number that decides whether an ad set keeps running. */
+/**
+ * Bookings per campaign — the number that decides whether an ad set keeps
+ * running, and the only production read the acquisitions tool makes
+ * (`acquisitions/`, see its docs/measurement.md).
+ *
+ * Defaults reproduce the original response: 90 days grouped by campaign and
+ * source. `by=adset|ad` regroups at the level Meta actually optimizes, and
+ * `daily=1` adds the booking date so a rolling sync can restate a window
+ * without rewriting history.
+ */
+const GROUPINGS = {
+  campaign: {
+    select: `COALESCE(utm_campaign, CASE WHEN fbclid IS NOT NULL THEN 'facebook-unnamed' ELSE 'direct' END) AS campaign,
+             COALESCE(utm_source, CASE WHEN fbclid IS NOT NULL THEN 'facebook' ELSE 'direct' END) AS source`,
+    by: ["campaign", "source"],
+  },
+  adset: {
+    select: `COALESCE(utm_campaign, 'unattributed') AS campaign,
+             COALESCE(adset_id, 'unattributed') AS adset_id,
+             COALESCE(adset_name, utm_content, '') AS adset_name`,
+    by: ["campaign", "adset_id", "adset_name"],
+  },
+  ad: {
+    select: `COALESCE(utm_campaign, 'unattributed') AS campaign,
+             COALESCE(adset_id, 'unattributed') AS adset_id,
+             COALESCE(ad_id, 'unattributed') AS ad_id,
+             COALESCE(ad_name, '') AS ad_name`,
+    by: ["campaign", "adset_id", "ad_id", "ad_name"],
+  },
+} as const;
+
 adminRoutes.get("/attribution", async (c) => {
+  const by = c.req.query("by") ?? "campaign";
+  if (!(by in GROUPINGS)) return c.json({ error: "invalid_by" }, 400);
+  // Meta's own attribution windows top out well inside a year; a wider request
+  // is a mistake, not a use case.
+  const days = Math.min(Math.max(Number(c.req.query("days") ?? 90) || 90, 1), 365);
+  const daily = c.req.query("daily") === "1";
+
+  // `created_at` is UTC (`datetime('now')`), so the day boundary here is UTC —
+  // set the Meta ad account to UTC reporting or accept that late-evening
+  // Atlanta bookings land on the next campaign-day.
+  const dateSelect = daily ? `date(created_at) AS date, ` : "";
+  const grouping = GROUPINGS[by as keyof typeof GROUPINGS];
+  const grouped = [...(daily ? ["date"] : []), ...grouping.by].join(", ");
+
   const { results } = await c.env.DB.prepare(
-    `SELECT COALESCE(utm_campaign, CASE WHEN fbclid IS NOT NULL THEN 'facebook-unnamed' ELSE 'direct' END) AS campaign,
-            COALESCE(utm_source, CASE WHEN fbclid IS NOT NULL THEN 'facebook' ELSE 'direct' END) AS source,
+    `SELECT ${dateSelect}${grouping.select},
             COUNT(*) AS bookings,
             SUM(CASE WHEN status IN ('confirmed', 'completed') THEN 1 ELSE 0 END) AS kept
        FROM appointments
-      WHERE created_at >= datetime('now', '-90 days')
-      GROUP BY campaign, source
+      WHERE created_at >= datetime('now', ?1)
+      GROUP BY ${grouped}
       ORDER BY bookings DESC`,
-  ).all();
+  )
+    .bind(`-${days} days`)
+    .all();
 
-  return c.json({ campaigns: results ?? [] });
+  return c.json({ campaigns: results ?? [], days, by, daily });
 });

@@ -6,6 +6,10 @@ on:
     # Prose never reaches the Worker bundle; a docs-only push runs no job.
     paths-ignore:
       - "docs/**"
+      # The acquisitions tool is a local Python CLI. It is never bundled into
+      # the Worker and never deployed, so a change there must not put the live
+      # site through a release. It has its own suite: `make ads-test`.
+      - "acquisitions/**"
       - "todo.txt"
       - "**/CLAUDE.md"
       - "**/AGENTS.md"

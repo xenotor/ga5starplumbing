@@ -1,5 +1,3 @@
 
 
-connect google calendar for admin
-
-prepare all metrics analytics for ads
+switch admin email to georgia5starplumbing@gmail.com
