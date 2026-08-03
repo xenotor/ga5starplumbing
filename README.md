@@ -32,10 +32,14 @@ are gitignored.
 | `workers/.dev.vars` | `wrangler dev`, injected as bindings on `env` | Worker runtime secrets: `ADMIN_TOKEN`, `NOTIFY_EMAIL_*` |
 | `.env` | the Makefile, which includes and exports it | tooling settings: `CLOUDFLARE_ACCOUNT_ID`, `WORKER_URL`, `ADMIN_TOKEN` for curl |
 
-The sample values work as-is against a local Worker — `make admin-appointments`
-authenticates because `.env` and `workers/.dev.vars` ship the same placeholder
-token. Neither file feeds production: deploys take their secrets from the
-GitHub `production` environment.
+The committed examples work as-is against a local Worker: `.env.example` and
+`.dev.vars.example` ship the same placeholder `ADMIN_TOKEN`, so
+`make admin-appointments` authenticates against `make run` with no editing.
+
+Your real `.env` is different — it holds this project's Cloudflare API token,
+which is what lets `make deploy` and `make d1-migrate` reach the account. Keep
+it out of git (it is gitignored) and off any shared machine. CI does not use it:
+the workflow takes its credentials from the GitHub `production` environment.
 
 `ENV` and `BUSINESS_TZ` are plain vars in `workers/wrangler.jsonc`, not secrets,
 so they are not duplicated in either file. The frontend reads no `VITE_*`
@@ -79,8 +83,26 @@ before inserting, so two people racing for the last slot cannot both win.
 `frontend/src/lib/attribution.js` captures them into `sessionStorage` on mount,
 and the booking POST replays them into the `appointments` row. `GET
 /api/admin/attribution` turns that into bookings-per-campaign — the number that
-decides whether an ad set keeps running. The same events also go to Analytics
-Engine (`ga5starplumbing_bookings`).
+decides whether an ad set keeps running. The same events are also emitted to
+Analytics Engine, which is currently switched off — see Cloudflare account.
+
+## Cloudflare account
+
+This project lives in its own Cloudflare account
+(`Georgia5starplumbing@gmail.com's Account`, `3424bc39…`) and shares nothing
+with any other project — no account, no database, no bindings, no quotas.
+
+`account_id` is pinned in `workers/wrangler.jsonc`, which is what enforces the
+separation: wrangler refuses to act if the active credentials belong to a
+different account, so a `wrangler login` session for some other Cloudflare
+account cannot deploy this Worker into it. Authenticate with the project's
+account-scoped API token in `.env` rather than an interactive login.
+
+Analytics Engine is an account-level opt-in that has not been enabled here, so
+the `analytics_engine_datasets` binding is commented out — deploying with it
+fails the release outright (code 10089). Bookings are unaffected, and
+per-campaign counts still come from D1 via `/api/admin/attribution`. To enable
+it: turn it on in the dashboard, uncomment the block, deploy.
 
 ## Deployment
 
@@ -92,7 +114,7 @@ Required GitHub `production` environment secrets:
 
 | Secret | Purpose |
 | --- | --- |
-| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | deploy credentials |
+| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | deploy credentials for **this project's** account (`3424bc39…`), not any other |
 | `ADMIN_TOKEN` | Bearer token for `/api/admin/*` |
 | `NOTIFY_EMAIL_TO`, `NOTIFY_EMAIL_FROM` | optional, reserved for booking notifications |
 
@@ -101,7 +123,7 @@ the printed id into `workers/wrangler.jsonc`.
 
 ## Cutover from GitHub Pages
 
-The Worker is live at `https://ga5starplumbing.tsval.workers.dev` while
+The Worker is live at `https://ga5starplumbing.georgia5starplumbing.workers.dev` while
 `ga5starplumbing.com` still points at GitHub Pages. The root `index.html`,
 `web_files/`, and `CNAME` are kept deliberately so merging this work does not
 take the old site down.

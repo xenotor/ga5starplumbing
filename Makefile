@@ -83,7 +83,7 @@ secrets-push:
 	cd workers && npx wrangler secret bulk .dev.vars
 
 # Hit the admin API by hand. Override either value inline:
-#   make admin-appointments WORKER_URL=https://ga5starplumbing.tsval.workers.dev
+#   make admin-appointments WORKER_URL=https://ga5starplumbing.georgia5starplumbing.workers.dev
 admin-appointments:
 	@test -n "$(ADMIN_TOKEN)" || { echo "ADMIN_TOKEN is unset — see .env.example"; exit 1; }
 	@curl -sS "$(WORKER_URL)/api/admin/appointments" -H "authorization: Bearer $(ADMIN_TOKEN)"

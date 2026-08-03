@@ -1,6 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "ga5starplumbing",
+  // This project has a dedicated Cloudflare account and shares nothing with any
+  // other project. Pinning the id here is what enforces that: wrangler refuses
+  // to deploy if the active credentials belong to a different account, so a
+  // stray `wrangler login` on a machine that also has other Cloudflare work
+  // cannot put this Worker in the wrong place. Never widen this to a variable.
+  "account_id": "3424bc3970f0faf1dbedd8a0c19a9a00",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-01",
   "compatibility_flags": ["nodejs_compat"],
@@ -27,18 +33,26 @@
     {
       "binding": "DB",
       "database_name": "ga5starplumbing",
-      "database_id": "a31df4c8-30e0-4c64-bef1-381fd36205b5",
+      "database_id": "893e4a8c-e4ac-45f0-b15a-deefd08763f9",
       "migrations_dir": "migrations"
     }
   ],
 
   // Booking funnel telemetry keyed by Facebook campaign (see src/lib/analytics.ts).
-  "analytics_engine_datasets": [
-    {
-      "binding": "BOOKING_ANALYTICS",
-      "dataset": "ga5starplumbing_bookings"
-    }
-  ],
+  //
+  // Commented out because Analytics Engine is an account-level opt-in and this
+  // account has not enabled it yet; deploying with the binding fails the whole
+  // release [code 10089]. src/lib/analytics.ts treats the binding as optional,
+  // so bookings work without it — only the aggregate funnel view is missing.
+  // Per-campaign booking counts come from D1 (/api/admin/attribution) and are
+  // unaffected. To turn it on, enable Analytics Engine at
+  // dash.cloudflare.com/<account>/workers/analytics-engine, then uncomment.
+  // "analytics_engine_datasets": [
+  //   {
+  //     "binding": "BOOKING_ANALYTICS",
+  //     "dataset": "ga5starplumbing_bookings"
+  //   }
+  // ],
 
   "observability": { "enabled": true },
 

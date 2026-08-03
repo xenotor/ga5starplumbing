@@ -21,3 +21,4 @@ workers/.dev.vars
 # Local developer environment (see .env.example)
 .env
 frontend/.env.local
+ga5creds.txt
