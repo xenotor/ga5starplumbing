@@ -1,7 +1,7 @@
 import { PHONE, PHONE_HREF, EMAIL } from '../content'
 import { PhoneIcon, MailIcon, StarIcon } from './Icons'
 
-export default function Hero() {
+export default function Hero({ area }) {
   return (
     <section id="top" className="relative overflow-hidden bg-brand-950 pt-28 text-white sm:pt-32">
       <div
@@ -22,12 +22,14 @@ export default function Hero() {
           </div>
 
           <h1 className="text-4xl font-black uppercase leading-tight tracking-tight sm:text-6xl lg:text-7xl">
-            Will fix <span className="text-accent-400">any leak!</span>
+            {area ? `${area.city}, GA plumber` : 'Will fix'}{' '}
+            <span className="text-accent-400">{area ? 'you can call' : 'any leak!'}</span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-lg text-brand-100">
-            We are a family owned business with over 25 years of experience. Our hard-working licensed and insured
-            plumbers guarantee to solve any issue with excellence.
+            {area
+              ? `Local plumbing repair for ${area.city} homes and businesses in ZIP codes ${area.zips.join(', ')}.`
+              : 'We are a family owned business with over 25 years of experience. Our hard-working licensed and insured plumbers guarantee to solve any issue with excellence.'}
           </p>
           <p className="mt-3 max-w-2xl text-lg text-brand-100">
             If you are looking for timely and exceptional service, call now or book an appointment.

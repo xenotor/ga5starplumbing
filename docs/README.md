@@ -16,3 +16,4 @@ to the code instead of restating it.
 | [deployment.md](deployment.md) | CI pipeline, required secrets, manual deploy |
 | [local-dev.md](local-dev.md) | env files, running and testing locally |
 | [cutover.md](cutover.md) | how the domain was moved off GitHub Pages |
+| [seo.md](seo.md) | crawl files, city pages and Search Console follow-up |

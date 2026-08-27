@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://ga5starplumbing.com/sitemap.xml
+Host: ga5starplumbing.com

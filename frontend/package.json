@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run build:embed",
+    "build": "vite build && node scripts/generate-seo.mjs && npm run build:embed",
     "build:embed": "vite build --config vite.embed.config.js",
     "preview": "vite preview",
     "test": "jest",

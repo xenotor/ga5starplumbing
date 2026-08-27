@@ -4,6 +4,14 @@ export const PHONE = '404.488.4889'
 export const PHONE_HREF = 'tel:+14044884889'
 export const EMAIL = 'georgia5starplumbing@gmail.com'
 
+export const SERVICE_AREAS = [
+  { city: 'Woodstock', slug: 'woodstock', zips: ['30188', '30189'] },
+  { city: 'Alpharetta', slug: 'alpharetta', zips: ['30004', '30005', '30009', '30022'] },
+  { city: 'Marietta', slug: 'marietta', zips: ['30060', '30061', '30062', '30064', '30066', '30067', '30068'] },
+  { city: 'Canton', slug: 'canton', zips: ['30114', '30115'] },
+  { city: 'Suwanee', slug: 'suwanee', zips: ['30024'] },
+]
+
 export const SOCIAL = {
   facebook: 'https://www.facebook.com/georgia5starplumbing/',
   twitter: 'https://twitter.com/star_georgia',
@@ -16,6 +24,7 @@ export const NAV = [
   { href: '#about', label: 'About' },
   { href: '#gallery', label: 'Gallery' },
   { href: '#reviews', label: 'Reviews' },
+  { href: '#service-areas', label: 'Service Areas' },
   { href: '#book', label: 'Book' },
 ]
 
