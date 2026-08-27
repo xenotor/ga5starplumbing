@@ -1,5 +1,20 @@
 # Cloudflare Workers static-asset headers.
 #
+# Machine discovery and content-use policy. Link headers expose canonical crawl
+# resources to clients that do not parse HTML.
+/*
+  Link: <https://ga5starplumbing.com/sitemap.xml>; rel="sitemap"; type="application/xml", <https://ga5starplumbing.com/llms.txt>; rel="alternate"; type="text/plain"
+  Content-Signal: search=yes, ai-input=yes, ai-train=no
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+/llms.txt
+  Cache-Control: public, max-age=3600
+#
 # The booking embed is loaded as a module script from other landing pages, and
 # cross-origin module scripts are fetched in CORS mode — without this header the
 # browser blocks the file before any of our code runs. The Worker cannot add it:

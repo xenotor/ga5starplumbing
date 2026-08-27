@@ -13,18 +13,24 @@ const areas = [
   { city: 'Suwanee', slug: 'suwanee', zips: ['30024'] },
 ]
 
-function pageHtml(area) {
-  const path = area ? `/plumber-${area.slug}-ga/` : '/'
+function pageHtml(area, booking = false) {
+  const path = booking ? '/book' : area ? `/plumber-${area.slug}-ga/` : '/'
   const canonical = `${origin}${path}`
-  const title = area
-    ? `Plumber in ${area.city}, GA | Georgia 5 Star Plumbing`
-    : 'North Georgia Plumber | Georgia 5 Star Plumbing'
-  const description = area
-    ? `Licensed, insured ${area.city}, GA plumber for emergency plumbing, leaks, drains, water heaters and plumbing repair. Serving ${area.zips.join(', ')}. Call 404.488.4889.`
-    : 'Licensed, insured North Georgia plumbers serving Woodstock, Alpharetta, Marietta, Canton and Suwanee. Plumbing repair, drains and water heaters. Book online.'
-  const fallback = area
-    ? `<div><h1>Plumber in ${area.city}, Georgia</h1><p>Georgia 5 Star Plumbing provides emergency plumbing, leak repair, drain cleaning, water heater repair and installation in ${area.city}, GA ${area.zips.join(', ')}.</p><p>Licensed and insured Master Plumber. Call 404.488.4889 or book online.</p></div>`
-    : '<div><h1>North Georgia plumber</h1><p>Georgia 5 Star Plumbing serves Woodstock, Alpharetta, Marietta, Canton and Suwanee with emergency plumbing, leak repair, drain cleaning and water heater service.</p><p>Licensed and insured Master Plumber. Call 404.488.4889 or book online.</p></div>'
+  const title = booking
+    ? 'Book a North Georgia Plumber | Georgia 5 Star Plumbing'
+    : area
+      ? `Plumber in ${area.city}, GA | Georgia 5 Star Plumbing`
+      : 'North Georgia Plumber | Georgia 5 Star Plumbing'
+  const description = booking
+    ? 'Request a plumbing appointment with Georgia 5 Star Plumbing. Choose an Atlanta-time service window online or call 404.488.4889.'
+    : area
+      ? `Licensed, insured ${area.city}, GA plumber for emergency plumbing, leaks, drains, water heaters and plumbing repair. Serving ${area.zips.join(', ')}. Call 404.488.4889.`
+      : 'Licensed, insured North Georgia plumbers serving Woodstock, Alpharetta, Marietta, Canton and Suwanee. Plumbing repair, drains and water heaters. Book online.'
+  const fallback = booking
+    ? '<div><h1>Book a North Georgia plumber</h1><p>Request a plumbing appointment online with Georgia 5 Star Plumbing or call 404.488.4889.</p></div>'
+    : area
+      ? `<div><h1>Plumber in ${area.city}, Georgia</h1><p>Georgia 5 Star Plumbing provides emergency plumbing, leak repair, drain cleaning, water heater repair and installation in ${area.city}, GA ${area.zips.join(', ')}.</p><p>Licensed and insured Master Plumber. Call 404.488.4889 or book online.</p></div>`
+      : '<div><h1>North Georgia plumber</h1><p>Georgia 5 Star Plumbing serves Woodstock, Alpharetta, Marietta, Canton and Suwanee with emergency plumbing, leak repair, drain cleaning and water heater service.</p><p>Licensed and insured Master Plumber. Call 404.488.4889 or book online.</p></div>'
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Plumber',
@@ -64,3 +70,6 @@ for (const area of areas) {
   await mkdir(directory, { recursive: true })
   await writeFile(resolve(directory, 'index.html'), pageHtml(area))
 }
+const bookingDirectory = resolve(dist, 'book')
+await mkdir(bookingDirectory, { recursive: true })
+await writeFile(resolve(bookingDirectory, 'index.html'), pageHtml(null, true))

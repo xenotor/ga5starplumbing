@@ -1,6 +1,24 @@
+# Content use: search and answer-engine retrieval allowed; model training denied.
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+
 User-agent: *
 Allow: /
 Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
 
 Sitemap: https://ga5starplumbing.com/sitemap.xml
 Host: ga5starplumbing.com

@@ -39,6 +39,31 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+describe("site discovery", () => {
+  it("serves page content as Markdown when requested", async () => {
+    const response = await SELF.fetch("https://ga5starplumbing.com/plumber-canton-ga/", {
+      headers: { accept: "text/markdown" },
+    });
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("text/markdown");
+    expect(await response.text()).toContain("# Canton, Georgia plumber");
+  });
+
+  it("returns a real noindex 404 for unknown SPA paths", async () => {
+    const response = await SELF.fetch("https://ga5starplumbing.com/not-a-real-page");
+    expect(response.status).toBe(404);
+    expect(response.headers.get("x-robots-tag")).toBe("noindex");
+  });
+
+  it("redirects city pages to their trailing-slash canonical", async () => {
+    const response = await SELF.fetch("https://ga5starplumbing.com/plumber-canton-ga", {
+      redirect: "manual",
+    });
+    expect(response.status).toBe(301);
+    expect(response.headers.get("location")).toBe("https://ga5starplumbing.com/plumber-canton-ga/");
+  });
+});
+
 describe("health", () => {
   it("reports ready when D1 answers", async () => {
     const response = await SELF.fetch("https://ga5starplumbing.com/api/health/ready");
