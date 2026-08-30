@@ -11,6 +11,8 @@ const areas = [
   { city: 'Marietta', slug: 'marietta', zips: ['30060', '30061', '30062', '30064', '30066', '30067', '30068'] },
   { city: 'Canton', slug: 'canton', zips: ['30114', '30115'] },
   { city: 'Suwanee', slug: 'suwanee', zips: ['30024'] },
+  { city: 'Roswell', slug: 'roswell', zips: ['30075', '30076', '30077', '30078'] },
+  { city: 'Cumming', slug: 'cumming', zips: ['30040', '30041'] },
 ]
 
 function pageHtml(area, booking = false) {
@@ -25,12 +27,12 @@ function pageHtml(area, booking = false) {
     ? 'Request a plumbing appointment with Georgia 5 Star Plumbing. Choose an Atlanta-time service window online or call 404.488.4889.'
     : area
       ? `Licensed, insured ${area.city}, GA plumber for emergency plumbing, leaks, drains, water heaters and plumbing repair. Serving ${area.zips.join(', ')}. Call 404.488.4889.`
-      : 'Licensed, insured North Georgia plumbers serving Woodstock, Alpharetta, Marietta, Canton and Suwanee. Plumbing repair, drains and water heaters. Book online.'
+      : 'Licensed, insured North Georgia plumbers serving Woodstock, Alpharetta, Marietta, Canton, Suwanee, Roswell and Cumming. Plumbing repair, drains, inspections and tankless water heaters. Book online.'
   const fallback = booking
     ? '<div><h1>Book a North Georgia plumber</h1><p>Request a plumbing appointment online with Georgia 5 Star Plumbing or call 404.488.4889.</p></div>'
     : area
       ? `<div><h1>Plumber in ${area.city}, Georgia</h1><p>Georgia 5 Star Plumbing provides emergency plumbing, leak repair, drain cleaning, water heater repair and installation in ${area.city}, GA ${area.zips.join(', ')}.</p><p>Licensed and insured Master Plumber. Call 404.488.4889 or book online.</p></div>`
-      : '<div><h1>North Georgia plumber</h1><p>Georgia 5 Star Plumbing serves Woodstock, Alpharetta, Marietta, Canton and Suwanee with emergency plumbing, leak repair, drain cleaning and water heater service.</p><p>Licensed and insured Master Plumber. Call 404.488.4889 or book online.</p></div>'
+      : '<div><h1>North Georgia plumber</h1><p>Georgia 5 Star Plumbing serves Woodstock, Alpharetta, Marietta, Canton, Suwanee, Roswell and Cumming with emergency plumbing, leak repair, drain cleaning, camera inspections and water heater service.</p><p>Licensed and insured Master Plumber. Call 404.488.4889 or book online.</p></div>'
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Plumber',

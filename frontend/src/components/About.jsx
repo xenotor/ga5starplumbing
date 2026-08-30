@@ -16,10 +16,10 @@ export default function About() {
             ))}
           </div>
           <img
-            src="/images/plumber2.png"
-            alt="Master plumber at work"
+            src="/images/gal16.png"
+            alt="Georgia 5 Star Plumbing owner and Master Plumber at work"
             loading="lazy"
-            className="mx-auto w-full max-w-md rounded-2xl"
+            className="mx-auto aspect-4/3 w-full max-w-md rounded-2xl object-cover shadow-xl"
           />
         </div>
       </section>
@@ -52,10 +52,10 @@ export default function About() {
             </a>
           </div>
           <img
-            src="/images/sink.png"
-            alt="Finished sink installation"
+            src="/images/jobs/general-plumbing.webp"
+            alt="Finished under-sink plumbing and garbage disposal installation"
             loading="lazy"
-            className="mx-auto w-full max-w-md rounded-2xl"
+            className="mx-auto aspect-4/3 w-full max-w-md rounded-2xl object-cover shadow-xl"
           />
         </div>
       </section>

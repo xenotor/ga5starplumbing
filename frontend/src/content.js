@@ -10,6 +10,8 @@ export const SERVICE_AREAS = [
   { city: 'Marietta', slug: 'marietta', zips: ['30060', '30061', '30062', '30064', '30066', '30067', '30068'] },
   { city: 'Canton', slug: 'canton', zips: ['30114', '30115'] },
   { city: 'Suwanee', slug: 'suwanee', zips: ['30024'] },
+  { city: 'Roswell', slug: 'roswell', zips: ['30075', '30076', '30077', '30078'] },
+  { city: 'Cumming', slug: 'cumming', zips: ['30040', '30041'] },
 ]
 
 export const SOCIAL = {
@@ -30,29 +32,31 @@ export const NAV = [
 
 export const SERVICES = [
   {
-    image: '/images/repair.png',
+    image: '/images/jobs/general-plumbing.webp',
     title: 'Installation & Repair',
-    body: 'Our team has made numerous plumbing and gas line diagnosis and repairs.',
+    body: 'Professional plumbing installation, diagnosis and repair for fixtures, piping and gas lines.',
   },
   {
-    image: '/images/waterheater.png',
+    image: '/images/jobs/water-heaters.webp',
     title: 'Water Heaters',
-    body: 'Experienced in a variety of water heater repairs and installation, including tankless and hybrid.',
+    body: 'Professional water heater installation, replacement and repair, including hybrid systems.',
   },
   {
-    image: '/images/bathroom.png',
-    title: 'Bathroom Remodels',
-    body: 'From leaky pipes to new installations, we will cover all plumbing needs.',
+    image: '/images/jobs/tankless-water-heaters.webp',
+    title: 'Tankless Water Heaters',
+    body: 'Professional tankless water heater installation, replacement and repair for reliable hot water.',
   },
   {
-    image: '/images/drain.png',
+    image: '/images/jobs/sewer-line-repair.webp',
     title: 'Drain Cleaning',
-    body: 'You need a plumbing professional when replacing sewer and drain pipes.',
+    body: 'Professional drain cleaning, camera inspection and sewer or drain pipe repair and replacement.',
   },
 ]
 
 export const ALSO_HELP = [
   'Emergency Plumbing',
+  'Camera Inspection',
+  'Plumbing Inspection',
   'Leak Detection',
   'Light Commercial Plumbing',
   'Outdoor Plumbing',
@@ -69,10 +73,21 @@ export const WHY_US = [
   'Punctual to appointments',
 ]
 
-export const GALLERY = Array.from({ length: 16 }, (_, i) => ({
-  src: `/images/gal${i + 1}.png`,
-  alt: `Georgia 5 Star Plumbing completed job ${i + 1}`,
-}))
+export const GALLERY = [
+  { src: '/images/jobs/gas-line-for-heater-grill.webp', alt: 'Gas line installation for a heater or grill' },
+  { src: '/images/jobs/general-plumbing.webp', alt: 'Finished under-sink plumbing and garbage disposal installation' },
+  { src: '/images/jobs/laundry-room-plumbing.webp', alt: 'Laundry room plumbing installation' },
+  { src: '/images/jobs/main-water-line-repair.webp', alt: 'Excavated main water line repair' },
+  { src: '/images/jobs/main-water-line-replacement.webp', alt: 'Main water line replacement at a North Georgia home' },
+  { src: '/images/jobs/sewer-line-repair.webp', alt: 'Excavated sewer line repair' },
+  { src: '/images/jobs/tankless-water-heaters.webp', alt: 'Installed tankless water heater' },
+  { src: '/images/jobs/water-heaters-2.webp', alt: 'Water heater installation with expansion tank' },
+  { src: '/images/jobs/water-heaters.webp', alt: 'Finished water heater installation' },
+  ...Array.from({ length: 16 }, (_, i) => ({
+    src: `/images/gal${i + 1}.png`,
+    alt: 'Completed plumbing installation by Georgia 5 Star Plumbing',
+  })),
+]
 
 export const REVIEWS = [
   {

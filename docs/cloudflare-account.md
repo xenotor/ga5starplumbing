@@ -35,6 +35,20 @@ The account is on the **paid Workers plan**, which Email Sending requires. The
 zone `aquapropipe.com` also lives in this account and is unrelated to this
 project — leave it alone.
 
+## DNS-AID and DNSSEC
+
+AI discovery uses this zone record:
+
+```dns
+_index._agents.ga5starplumbing.com. 3600 IN SVCB 1 ga5starplumbing.com. mandatory="alpn,port" alpn="h2" port="443"
+```
+
+It advertises existing HTTPS service only; do not add `_a2a` or MCP records
+unless corresponding public services exist. DNSSEC was enabled through
+Cloudflare on 2026-08-27. Cloudflare Registrar owns domain registration and
+publishes DS delegation; status can briefly read `pending` while registrar and
+registry propagate it.
+
 ## Analytics Engine is off
 
 Analytics Engine is an account-level opt-in that has not been enabled — moving

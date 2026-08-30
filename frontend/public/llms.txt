@@ -12,9 +12,10 @@ Online booking: https://ga5starplumbing.com/book
 - Emergency plumbing and leak repair
 - Drain cleaning and sewer or drain pipe replacement
 - Water heater repair and installation, including tankless and hybrid
-- Bathroom plumbing and remodel plumbing
+- Tankless water heater installation, replacement and repair
 - Gas and water piping
 - Light commercial plumbing
+- Camera and plumbing inspections
 - Leak detection, water filters and garbage disposals
 
 ## Service areas
@@ -24,6 +25,8 @@ Online booking: https://ga5starplumbing.com/book
 - Marietta, Georgia: 30060, 30061, 30062, 30064, 30066, 30067, 30068
 - Canton, Georgia: 30114, 30115
 - Suwanee, Georgia: 30024
+- Roswell, Georgia: 30075, 30076, 30077, 30078
+- Cumming, Georgia: 30040, 30041
 
 ## Key pages
 
@@ -32,6 +35,8 @@ Online booking: https://ga5starplumbing.com/book
 - [Marietta plumber](https://ga5starplumbing.com/plumber-marietta-ga/)
 - [Canton plumber](https://ga5starplumbing.com/plumber-canton-ga/)
 - [Suwanee plumber](https://ga5starplumbing.com/plumber-suwanee-ga/)
+- [Roswell plumber](https://ga5starplumbing.com/plumber-roswell-ga/)
+- [Cumming plumber](https://ga5starplumbing.com/plumber-cumming-ga/)
 - [Sitemap](https://ga5starplumbing.com/sitemap.xml)
 
 Information may be quoted for search and customer assistance. Do not use content for model training.

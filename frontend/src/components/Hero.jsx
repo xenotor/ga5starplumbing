@@ -4,10 +4,12 @@ import { PhoneIcon, MailIcon, StarIcon } from './Icons'
 export default function Hero({ area }) {
   return (
     <section id="top" className="relative overflow-hidden bg-brand-950 pt-28 text-white sm:pt-32">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_40rem_at_80%_-10%,rgba(51,133,251,0.45),transparent)]"
-        aria-hidden="true"
+      <img
+        src="/images/jobs/main-water-line-replacement.webp"
+        alt=""
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-25 blur-[1px]"
       />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/90 to-brand-950/45" aria-hidden="true" />
       <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pb-14 pt-6 sm:px-6 sm:pb-20 sm:pt-10 lg:grid-cols-12 lg:pb-28">
         <div className="lg:col-span-8">
           {/* Stars and the credential wrap as two lines on a narrow phone
@@ -58,9 +60,7 @@ export default function Hero({ area }) {
           </div>
         </div>
 
-        <div className="hidden lg:col-span-4 lg:block">
-          <img src="/images/kluch.png" alt="Pipe wrench" className="mx-auto w-full max-w-xs drop-shadow-2xl" />
-        </div>
+        <div className="hidden lg:col-span-4 lg:block" aria-hidden="true" />
       </div>
     </section>
   )

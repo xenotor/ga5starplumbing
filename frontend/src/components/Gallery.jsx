@@ -14,15 +14,18 @@ export default function Gallery() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading eyebrow="Our work" title="Gallery" />
 
-        <div className="mt-10 grid gap-6 sm:mt-12 lg:grid-cols-2 lg:gap-8">
-          <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
+        <div className="mt-10 grid items-start gap-6 sm:mt-12 lg:grid-cols-2 lg:gap-8">
+          <div className="relative overflow-hidden rounded-2xl bg-brand-950 shadow-lg">
             <button type="button" onClick={() => setLightbox(true)} className="block w-full">
               <img
                 src={GALLERY[active].src}
                 alt={GALLERY[active].alt}
-                className="aspect-4/3 w-full object-cover"
+                className="aspect-4/3 w-full object-contain"
               />
             </button>
+            <p className="bg-white px-5 py-4 text-sm leading-relaxed text-slate-700 sm:text-base">
+              {GALLERY[active].alt}
+            </p>
             <button
               type="button"
               onClick={() => step(-1)}
@@ -41,7 +44,7 @@ export default function Gallery() {
             </button>
           </div>
 
-          <ul className="grid grid-cols-4 gap-3 sm:grid-cols-6 lg:grid-cols-4">
+          <ul className="grid max-h-[32rem] grid-cols-4 gap-3 overflow-y-auto pr-1 sm:grid-cols-6 lg:grid-cols-4">
             {GALLERY.map((photo, index) => (
               <li key={photo.src}>
                 <button

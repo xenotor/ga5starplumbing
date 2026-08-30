@@ -8,9 +8,9 @@ export default function ServiceAreas() {
         <h2 className="mt-2 text-3xl font-black uppercase text-brand-950 sm:text-4xl">Local plumbers near you</h2>
         <p className="mt-4 max-w-3xl text-lg text-slate-700">
           Georgia 5 Star Plumbing provides residential and light commercial plumbing repair across North Metro
-          Atlanta, including Cherokee, Cobb, Fulton and Gwinnett counties.
+          Atlanta, including Cherokee, Cobb, Fulton, Forsyth and Gwinnett counties.
         </p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SERVICE_AREAS.map((area) => (
             <article key={area.slug} className="rounded-xl border border-brand-200 bg-white p-5">
               <h3 className="text-lg font-bold text-brand-900">
